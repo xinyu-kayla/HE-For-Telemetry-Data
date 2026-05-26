@@ -1,0 +1,17 @@
+[
+  {
+    "scheme_name": "Paillier",
+    "num_hops": 12,
+    "operations_per_hop": 1,
+    "success": true,
+    "failure_reason": "",
+    "final_computed": 119.34,
+    "final_expected": 119.33868042838569,
+    "final_error": 0.001319571614317283,
+    "final_relative_error": 1.1057367230636031e-05,
+    "mean_absolute_error": 0.002718564636350488,
+    "max_absolute_error": 0.0068970312875364925,
+    "mean_latency": 0.2260747833546096,
+    "total_latency": 2.712897400255315
+  }
+]

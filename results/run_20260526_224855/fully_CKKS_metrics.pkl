@@ -1,0 +1,17 @@
+[
+  {
+    "scheme_name": "CKKS",
+    "num_hops": 3,
+    "operations_per_hop": 1,
+    "success": true,
+    "failure_reason": "",
+    "final_computed": 18.985911767442694,
+    "final_expected": 18.98588460632823,
+    "final_error": 2.7161114463325475e-05,
+    "final_relative_error": 1.4305951514173473e-06,
+    "mean_absolute_error": 9.05423508138862e-06,
+    "max_absolute_error": 2.7161114463325475e-05,
+    "mean_latency": 0.025309400012095768,
+    "total_latency": 0.07592820003628731
+  }
+]

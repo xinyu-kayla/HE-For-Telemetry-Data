@@ -1,0 +1,17 @@
+[
+  {
+    "scheme_name": "CKKS",
+    "num_hops": 6,
+    "operations_per_hop": 1,
+    "success": false,
+    "failure_reason": "Argument 'ptxt' has incorrect type (expected Pyfhel.PyPtxt.PyPtxt, got float)",
+    "final_computed": 18.177233654607306,
+    "final_expected": 18.17723365174978,
+    "final_error": 2.8575257715601765e-09,
+    "final_relative_error": 1.5720355617860393e-10,
+    "mean_absolute_error": 2.8575257715601765e-09,
+    "max_absolute_error": 2.8575257715601765e-09,
+    "mean_latency": 0.03483520005829632,
+    "total_latency": 0.03483520005829632
+  }
+]

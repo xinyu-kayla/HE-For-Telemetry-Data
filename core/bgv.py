@@ -1,4 +1,4 @@
-"""BGV scheme using Pyfhel with proper relinearization."""
+"""BGV scheme using Pyfhel with proper relinearization and multiply_plain."""
 
 import numpy as np
 
@@ -53,6 +53,14 @@ class BGVScheme(HEScheme):
         result = c1 * c2
         self._he.relinearize(result)
         return result
+
+    def multiply_constant(self, ct, constant: float, keypair: HEKeyPair):
+        """Multiply ciphertext by a plaintext constant using multiply_plain."""
+        if self._he is None:
+            self._he = keypair.public_key
+        pt_int = int(constant)
+        plain = self._he.encode(np.array([pt_int], dtype=np.int64))
+        return self._he.multiply_plain(ct, plain)
 
     def get_noise_budget(self, ciphertext) -> float:
         if hasattr(self._he, "noiseBudget"):

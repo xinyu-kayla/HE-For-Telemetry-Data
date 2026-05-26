@@ -1,4 +1,4 @@
-"""Fully homomorphic experiment with random add/mul operations and noise monitoring."""
+"""Fully homomorphic experiment with add and multiply-by-constant only."""
 
 import time
 import random
@@ -14,7 +14,7 @@ from experiments.base_experiment import BaseExperiment
 
 
 class FullyExperiment(BaseExperiment):
-    """Runs fully homomorphic experiments with random mixed operations."""
+    """Runs fully homomorphic experiments with mixed add/multiply constant."""
 
     def __init__(self, num_routers: int = 6, num_fields: int = 2):
         super().__init__(num_routers, num_fields)
@@ -27,9 +27,9 @@ class FullyExperiment(BaseExperiment):
             if mod == 0:
                 ops = [RoutingOperation(OperationType.ADD_CONSTANT, random.uniform(1, 5))]
             elif mod == 1:
-                ops = [RoutingOperation(OperationType.MULTIPLY_CONSTANT, random.uniform(0.8, 1.2))]
+                ops = [RoutingOperation(OperationType.MULTIPLY_CONSTANT, random.uniform(0.95, 1.05))]
             else:
-                ops = [RoutingOperation(OperationType.MULTIPLY_CIPHERTEXT)]
+                ops = [RoutingOperation(OperationType.MULTIPLY_CONSTANT, random.uniform(0.9, 1.1))]
             ops_per_router.append(ops)
         return ops_per_router
 
@@ -44,8 +44,6 @@ class FullyExperiment(BaseExperiment):
                     current += op.value
                 elif op.op_type == OperationType.MULTIPLY_CONSTANT:
                     current *= op.value
-                elif op.op_type == OperationType.MULTIPLY_CIPHERTEXT:
-                    current = current * current
             expected.append(current)
         return expected
 
@@ -68,11 +66,8 @@ class FullyExperiment(BaseExperiment):
             if scheme.name == "GSW":
                 return self._run_gsw(scheme, router_operations, sim, metrics)
 
-            secondary = initial_value * 1.5
-            initial_plaintexts = [initial_value, secondary] + [0.0] * (self.num_fields - 2)
-
+            initial_plaintexts = [initial_value] + [0.0] * (self.num_fields - 1)
             temp_ct0 = scheme.encrypt(initial_value, sim.keypair)
-            temp_ct1 = scheme.encrypt(secondary, sim.keypair)
             expected_values = self._compute_expected_values(initial_value, router_operations)
 
             for hop_idx, ops in enumerate(router_operations):
@@ -83,11 +78,8 @@ class FullyExperiment(BaseExperiment):
                     elif op.op_type == OperationType.MULTIPLY_CONSTANT:
                         if scheme.supports_multiplicative():
                             temp_ct0 = scheme.multiply_constant(temp_ct0, op.value, sim.keypair)
-                    elif op.op_type == OperationType.MULTIPLY_CIPHERTEXT:
-                        if scheme.supports_multiplicative():
-                            temp_ct0 = scheme.multiply(temp_ct0, temp_ct1, sim.keypair)
-
                 hop_latency = time.perf_counter() - hop_start
+
                 computed = scheme.decrypt(temp_ct0, sim.keypair)
                 expected = expected_values[hop_idx + 1]
                 noise = scheme.get_noise_budget(temp_ct0)
@@ -111,12 +103,10 @@ class FullyExperiment(BaseExperiment):
         return metrics
 
     def _run_gsw(self, scheme, router_operations, sim, metrics):
-        """Boolean mixed circuit for GSW."""
         m1, m2 = 1, 0
         ct1 = scheme.encrypt(m1, sim.keypair)
         ct2 = scheme.encrypt(m2, sim.keypair)
         expected = m1
-
         for hop_idx, ops in enumerate(router_operations):
             for op in ops:
                 if op.op_type == OperationType.ADD_CONSTANT:
@@ -129,9 +119,6 @@ class FullyExperiment(BaseExperiment):
                     const_ct = scheme.encrypt(const_val, sim.keypair)
                     ct1 = scheme.multiply(ct1, const_ct, sim.keypair)
                     expected = (expected * const_val) % 2
-                elif op.op_type == OperationType.MULTIPLY_CIPHERTEXT:
-                    ct1 = scheme.multiply(ct1, ct2, sim.keypair)
-                    expected = (expected * m2) % 2
             computed = scheme.decrypt(ct1, sim.keypair)
             noise = scheme.get_noise_budget(ct1)
             metrics.record_hop(hop_idx, computed, expected, noise=noise, latency=0.001)

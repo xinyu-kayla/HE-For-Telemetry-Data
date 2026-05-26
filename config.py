@@ -4,7 +4,7 @@ Configuration settings for homomorphic encryption telemetry validation model.
 
 # Experiment Configuration
 NUM_ROUTERS_ADDITIVE = 12
-NUM_ROUTERS_MULTIPLICATIVE = 10
+NUM_ROUTERS_MULTIPLICATIVE = 4      # reduced
 NUM_RUNS_PER_SCHEME = 5
 NUM_FIELDS = 3
 
@@ -26,7 +26,7 @@ PAILLIER_KEY_SIZE = 1024
 POLY_MODULUS_DEGREE = 2**14
 PLAINTEXT_MODULUS = 65537
 CKKS_SCALE = 2**40
-CKKS_QI_SIZES = [60, 40, 40, 40, 40, 60]
+CKKS_QI_SIZES = [60, 40, 40, 40, 40, 40, 40, 60]   # extended chain
 
 # GSW Configuration
 GSW_N = 4
@@ -43,6 +43,6 @@ ENABLE_DETAILED_LOGGING = False
 USE_GPU_ACCELERATION = False
 
 # Fully Homomorphic Configuration
-NUM_ROUTERS_FULLY = 6
+NUM_ROUTERS_FULLY = 3               # reduced
 INITIAL_TELEMETRY_FULLY = 10.0
 SECONDARY_TELEMETRY_FULLY = 15.0

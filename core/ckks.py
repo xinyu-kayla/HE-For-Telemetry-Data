@@ -1,7 +1,7 @@
-"""CKKS scheme using Pyfhel with proper rescaling and noise handling."""
+"""CKKS scheme using Pyfhel with multiply_plain via * operator."""
 
 import numpy as np
-
+import config
 from core.base import HEScheme, HEKeyPair
 
 
@@ -25,9 +25,9 @@ class CKKSScheme(HEScheme):
         self._he = self.Pyfhel()
         params = {
             "scheme": "CKKS",
-            "n": 2**14,
-            "scale": 2**40,
-            "qi_sizes": [60, 40, 40, 40, 40, 60],
+            "n": config.POLY_MODULUS_DEGREE,
+            "scale": config.CKKS_SCALE,
+            "qi_sizes": config.CKKS_QI_SIZES,
         }
         self._he.contextGen(**params)
         self._he.keyGen()
@@ -64,6 +64,12 @@ class CKKSScheme(HEScheme):
         if hasattr(self._he, "rescale_to_next"):
             self._he.rescale_to_next(result)
         return result
+
+    def multiply_constant(self, ct, constant: float, keypair: HEKeyPair):
+        """Multiply ciphertext by a constant using Pyfhel's built-in operator."""
+        if self._he is None:
+            self._he = keypair.public_key
+        return ct * constant   # Pyfhel handles encoding internally
 
     def get_noise_budget(self, ciphertext) -> float:
         return -1.0

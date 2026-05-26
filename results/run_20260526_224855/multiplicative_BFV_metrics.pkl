@@ -1,0 +1,17 @@
+[
+  {
+    "scheme_name": "BFV",
+    "num_hops": 4,
+    "operations_per_hop": 1,
+    "success": true,
+    "failure_reason": "",
+    "final_computed": 10155.0,
+    "final_expected": -4.140366529740353,
+    "final_error": 10159.14036652974,
+    "final_relative_error": 2453.6814055738837,
+    "mean_absolute_error": 11336.104112771929,
+    "max_absolute_error": 18798.25762363538,
+    "mean_latency": 0.01648502502939664,
+    "total_latency": 0.06594010011758655
+  }
+]

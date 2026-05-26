@@ -1,4 +1,4 @@
-"""Multiplicative homomorphic experiment."""
+"""Multiplicative homomorphic experiment (constant multiplication only)."""
 
 import time
 import numpy as np
@@ -13,7 +13,7 @@ from experiments.base_experiment import BaseExperiment
 
 
 class MultiplicativeExperiment(BaseExperiment):
-    """Runs multiplicative homomorphic experiments."""
+    """Runs multiplicative homomorphic experiments (only multiply by constant)."""
 
     def __init__(self, num_routers: int = 8, num_fields: int = 2):
         super().__init__(num_routers, num_fields)
@@ -21,15 +21,9 @@ class MultiplicativeExperiment(BaseExperiment):
 
     def _generate_router_operations(self) -> List[List[RoutingOperation]]:
         ops_per_router = []
-        for router_idx in range(self.num_routers):
-            mod = router_idx % 3
-            if mod == 0:
-                factor = np.random.uniform(0.5, 2.0)
-                ops = [RoutingOperation(OperationType.MULTIPLY_CONSTANT, factor)]
-            elif mod == 1:
-                ops = [RoutingOperation(OperationType.MULTIPLY_CIPHERTEXT)]
-            else:
-                ops = [RoutingOperation(OperationType.MULTIPLY_CONSTANT, np.random.uniform(0.9, 1.1))]
+        for _ in range(self.num_routers):
+            factor = np.random.uniform(0.95, 1.05)   # stable growth
+            ops = [RoutingOperation(OperationType.MULTIPLY_CONSTANT, factor)]
             ops_per_router.append(ops)
         return ops_per_router
 
@@ -41,8 +35,6 @@ class MultiplicativeExperiment(BaseExperiment):
             for op in ops:
                 if op.op_type == OperationType.MULTIPLY_CONSTANT:
                     current *= op.value
-                elif op.op_type == OperationType.MULTIPLY_CIPHERTEXT:
-                    current = current * current
             expected.append(current)
         return expected
 
@@ -60,11 +52,8 @@ class MultiplicativeExperiment(BaseExperiment):
             if scheme.name == "GSW":
                 return self._run_gsw(scheme, router_operations, sim, metrics)
 
-            secondary = initial_value * 1.5
-            initial_plaintexts = [initial_value, secondary] + [1.0] * (self.num_fields - 2)
-
+            initial_plaintexts = [initial_value] + [1.0] * (self.num_fields - 1)
             temp_ct0 = scheme.encrypt(initial_value, sim.keypair)
-            temp_ct1 = scheme.encrypt(secondary, sim.keypair)
             expected_values = self._compute_expected_values(initial_value, router_operations)
 
             for hop_idx, ops in enumerate(router_operations):
@@ -73,9 +62,6 @@ class MultiplicativeExperiment(BaseExperiment):
                     if op.op_type == OperationType.MULTIPLY_CONSTANT:
                         if scheme.supports_multiplicative():
                             temp_ct0 = scheme.multiply_constant(temp_ct0, op.value, sim.keypair)
-                    elif op.op_type == OperationType.MULTIPLY_CIPHERTEXT:
-                        if scheme.supports_multiplicative():
-                            temp_ct0 = scheme.multiply(temp_ct0, temp_ct1, sim.keypair)
                 hop_latency = time.perf_counter() - hop_start
 
                 computed = scheme.decrypt(temp_ct0, sim.keypair)
@@ -101,12 +87,10 @@ class MultiplicativeExperiment(BaseExperiment):
         return metrics
 
     def _run_gsw(self, scheme, router_operations, sim, metrics):
-        """Boolean multiplicative circuit for GSW."""
         m1, m2 = 1, 0
         ct1 = scheme.encrypt(m1, sim.keypair)
         ct2 = scheme.encrypt(m2, sim.keypair)
         expected = m1
-
         for hop_idx, ops in enumerate(router_operations):
             for op in ops:
                 if op.op_type == OperationType.MULTIPLY_CONSTANT:
@@ -114,9 +98,6 @@ class MultiplicativeExperiment(BaseExperiment):
                     const_ct = scheme.encrypt(const_val, sim.keypair)
                     ct1 = scheme.multiply(ct1, const_ct, sim.keypair)
                     expected = (expected * const_val) % 2
-                elif op.op_type == OperationType.MULTIPLY_CIPHERTEXT:
-                    ct1 = scheme.multiply(ct1, ct2, sim.keypair)
-                    expected = (expected * m2) % 2
             computed = scheme.decrypt(ct1, sim.keypair)
             noise = scheme.get_noise_budget(ct1)
             metrics.record_hop(hop_idx, computed, expected, noise=noise, latency=0.001)

@@ -1,0 +1,17 @@
+[
+  {
+    "scheme_name": "BGV",
+    "num_hops": 6,
+    "operations_per_hop": 1,
+    "success": false,
+    "failure_reason": "Argument 'ptxt' has incorrect type (expected Pyfhel.PyPtxt.PyPtxt, got int)",
+    "final_computed": 11.0,
+    "final_expected": 12.10837724190479,
+    "final_error": 1.1083772419047904,
+    "final_relative_error": 0.0915380500418961,
+    "mean_absolute_error": 1.1083772419047904,
+    "max_absolute_error": 1.1083772419047904,
+    "mean_latency": 0.005344900069758296,
+    "total_latency": 0.005344900069758296
+  }
+]

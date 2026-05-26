@@ -1,0 +1,17 @@
+[
+  {
+    "scheme_name": "CKKS",
+    "num_hops": 6,
+    "operations_per_hop": 1,
+    "success": false,
+    "failure_reason": "encrypted_ntt and plain_ntt parameter mismatch",
+    "final_computed": 481.7823497483961,
+    "final_expected": 479.65361926751604,
+    "final_error": 2.1287304808800513,
+    "final_relative_error": 0.004438057788723483,
+    "mean_absolute_error": 1.063982500346718,
+    "max_absolute_error": 2.1287304808800513,
+    "mean_latency": 0.02804092498263344,
+    "total_latency": 0.11216369993053377
+  }
+]

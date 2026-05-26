@@ -1,0 +1,17 @@
+[
+  {
+    "scheme_name": "RSA",
+    "num_hops": 4,
+    "operations_per_hop": 1,
+    "success": true,
+    "failure_reason": "",
+    "final_computed": 0.0,
+    "final_expected": -0.5309509454718729,
+    "final_error": 0.5309509454718729,
+    "final_relative_error": 0.9999999998116587,
+    "mean_absolute_error": 0.539364379313027,
+    "max_absolute_error": 0.5498652863490587,
+    "mean_latency": 7.97503162175417e-06,
+    "total_latency": 3.190012648701668e-05
+  }
+]

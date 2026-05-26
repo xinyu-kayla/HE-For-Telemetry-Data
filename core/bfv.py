@@ -1,4 +1,4 @@
-"""BFV scheme using Pyfhel with proper relinearization."""
+"""BFV scheme using Pyfhel with proper relinearization and multiply_plain."""
 
 import numpy as np
 
@@ -40,7 +40,7 @@ class BFVScheme(HEScheme):
             self._he = keypair.secret_key
         res = self._he.decrypt(ciphertext)
         if isinstance(res, (list, np.ndarray)):
-            return float(np.max(res)) if len(res) > 0 else 0.0
+            return float(res[0]) if len(res) > 0 else 0.0
         return float(res)
 
     def add(self, c1, c2, keypair: HEKeyPair):
@@ -54,6 +54,14 @@ class BFVScheme(HEScheme):
         result = c1 * c2
         self._he.relinearize(result)
         return result
+
+    def multiply_constant(self, ct, constant: float, keypair: HEKeyPair):
+        """Multiply ciphertext by a plaintext constant using multiply_plain."""
+        if self._he is None:
+            self._he = keypair.public_key
+        pt_int = int(constant)
+        plain = self._he.encode(np.array([pt_int], dtype=np.int64))
+        return self._he.multiply_plain(ct, plain)
 
     def get_noise_budget(self, ciphertext) -> float:
         if hasattr(self._he, "noiseBudget"):
