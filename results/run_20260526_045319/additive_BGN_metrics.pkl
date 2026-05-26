@@ -1,0 +1,47 @@
+[
+  {
+    "scheme_name": "BGN",
+    "num_hops": 12,
+    "operations_per_hop": 1,
+    "success": true,
+    "failure_reason": "",
+    "final_computed": 6.065376933619177e+76,
+    "final_expected": 163.77750658598066,
+    "final_error": 6.065376933619177e+76,
+    "final_relative_error": 3.703424884192656e+74,
+    "mean_absolute_error": 3.861504268255682e+76,
+    "max_absolute_error": 1.0234338999104266e+77,
+    "mean_latency": 0.0,
+    "total_latency": 0.0
+  },
+  {
+    "scheme_name": "BGN",
+    "num_hops": 12,
+    "operations_per_hop": 1,
+    "success": true,
+    "failure_reason": "",
+    "final_computed": 7.53172803446183e+76,
+    "final_expected": 157.54655606309024,
+    "final_error": 7.53172803446183e+76,
+    "final_relative_error": 4.780636418000108e+74,
+    "mean_absolute_error": 5.579968476818058e+76,
+    "max_absolute_error": 1.0440783735247052e+77,
+    "mean_latency": 0.0,
+    "total_latency": 0.0
+  },
+  {
+    "scheme_name": "BGN",
+    "num_hops": 12,
+    "operations_per_hop": 1,
+    "success": true,
+    "failure_reason": "",
+    "final_computed": 1.679040939115188e+76,
+    "final_expected": 181.71240102045903,
+    "final_error": 1.679040939115188e+76,
+    "final_relative_error": 9.240101004032304e+73,
+    "mean_absolute_error": 4.576630415006558e+76,
+    "max_absolute_error": 1.0280152443973896e+77,
+    "mean_latency": 0.0,
+    "total_latency": 0.0
+  }
+]

@@ -1,0 +1,47 @@
+[
+  {
+    "scheme_name": "ElGamal",
+    "num_hops": 10,
+    "operations_per_hop": 1,
+    "success": false,
+    "failure_reason": "ElGamal does not support homomorphic addition",
+    "final_computed": 0.0,
+    "final_expected": 9.841965104823295,
+    "final_error": 9.841965104823295,
+    "final_relative_error": 0.9999999999898395,
+    "mean_absolute_error": 6.489577871863361,
+    "max_absolute_error": 9.841965104823295,
+    "mean_latency": 0.0,
+    "total_latency": 0.0
+  },
+  {
+    "scheme_name": "ElGamal",
+    "num_hops": 10,
+    "operations_per_hop": 1,
+    "success": false,
+    "failure_reason": "ElGamal does not support homomorphic addition",
+    "final_computed": 40.0,
+    "final_expected": 47.73186414509641,
+    "final_error": 7.731864145096409,
+    "final_relative_error": 0.16198537986232245,
+    "mean_absolute_error": 25969.320344618303,
+    "max_absolute_error": 51930.90882509151,
+    "mean_latency": 0.0,
+    "total_latency": 0.0
+  },
+  {
+    "scheme_name": "ElGamal",
+    "num_hops": 10,
+    "operations_per_hop": 1,
+    "success": false,
+    "failure_reason": "ElGamal does not support homomorphic addition",
+    "final_computed": 187.0,
+    "final_expected": 358.7599088044925,
+    "final_error": 171.7599088044925,
+    "final_relative_error": 0.4787600414349693,
+    "mean_absolute_error": 89.85043365100253,
+    "max_absolute_error": 171.7599088044925,
+    "mean_latency": 0.0,
+    "total_latency": 0.0
+  }
+]

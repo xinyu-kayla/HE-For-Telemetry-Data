@@ -1,0 +1,47 @@
+[
+  {
+    "scheme_name": "GSW",
+    "num_hops": 12,
+    "operations_per_hop": 1,
+    "success": true,
+    "failure_reason": "",
+    "final_computed": 0.0,
+    "final_expected": 167.09702810595525,
+    "final_error": 167.09702810595525,
+    "final_relative_error": 0.9999999999994016,
+    "mean_absolute_error": 139.96690666301978,
+    "max_absolute_error": 167.09702810595525,
+    "mean_latency": 0.0,
+    "total_latency": 0.0
+  },
+  {
+    "scheme_name": "GSW",
+    "num_hops": 12,
+    "operations_per_hop": 1,
+    "success": true,
+    "failure_reason": "",
+    "final_computed": 1.0,
+    "final_expected": 166.31186037800987,
+    "final_error": 165.31186037800987,
+    "final_relative_error": 0.9939871997233,
+    "mean_absolute_error": 138.00218803214148,
+    "max_absolute_error": 165.31186037800987,
+    "mean_latency": 0.0,
+    "total_latency": 0.0
+  },
+  {
+    "scheme_name": "GSW",
+    "num_hops": 12,
+    "operations_per_hop": 1,
+    "success": true,
+    "failure_reason": "",
+    "final_computed": 1.0,
+    "final_expected": 165.19031467613922,
+    "final_error": 164.19031467613922,
+    "final_relative_error": 0.9939463763232129,
+    "mean_absolute_error": 138.66517544540656,
+    "max_absolute_error": 164.19031467613922,
+    "mean_latency": 0.0,
+    "total_latency": 0.0
+  }
+]

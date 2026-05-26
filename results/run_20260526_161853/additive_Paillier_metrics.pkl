@@ -1,0 +1,47 @@
+[
+  {
+    "scheme_name": "Paillier",
+    "num_hops": 12,
+    "operations_per_hop": 1,
+    "success": true,
+    "failure_reason": "",
+    "final_computed": 169.34,
+    "final_expected": 169.33868042838571,
+    "final_error": 0.0013195716142888614,
+    "final_relative_error": 7.792499687312353e-06,
+    "mean_absolute_error": 0.0027185646363487117,
+    "max_absolute_error": 0.0068970312875364925,
+    "mean_latency": 0.21410449164492698,
+    "total_latency": 2.569253899739124
+  },
+  {
+    "scheme_name": "Paillier",
+    "num_hops": 12,
+    "operations_per_hop": 1,
+    "success": true,
+    "failure_reason": "",
+    "final_computed": 147.38,
+    "final_expected": 147.36329574331816,
+    "final_error": 0.01670425668183384,
+    "final_relative_error": 0.00011335425553265641,
+    "mean_absolute_error": 0.010651664257209129,
+    "max_absolute_error": 0.017917767172292542,
+    "mean_latency": 0.22123649169225246,
+    "total_latency": 2.6548379003070295
+  },
+  {
+    "scheme_name": "Paillier",
+    "num_hops": 12,
+    "operations_per_hop": 1,
+    "success": true,
+    "failure_reason": "",
+    "final_computed": 158.25,
+    "final_expected": 158.24435999352053,
+    "final_error": 0.005640006479467274,
+    "final_relative_error": 3.5641121615295776e-05,
+    "mean_absolute_error": 0.0023913589708032625,
+    "max_absolute_error": 0.005640006479467274,
+    "mean_latency": 0.22462154165259562,
+    "total_latency": 2.6954584998311475
+  }
+]
