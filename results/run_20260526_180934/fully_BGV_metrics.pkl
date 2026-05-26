@@ -1,0 +1,17 @@
+[
+  {
+    "scheme_name": "BGV",
+    "num_hops": 6,
+    "operations_per_hop": 1,
+    "success": false,
+    "failure_reason": "encrypted1 and encrypted2 parameter mismatch",
+    "final_computed": 0.0,
+    "final_expected": 9.935126563624324,
+    "final_error": 9.935126563624324,
+    "final_relative_error": 0.9999999999899347,
+    "mean_absolute_error": 5.691048350839209,
+    "max_absolute_error": 9.935126563624324,
+    "mean_latency": 0.03499895002460107,
+    "total_latency": 0.06999790004920214
+  }
+]

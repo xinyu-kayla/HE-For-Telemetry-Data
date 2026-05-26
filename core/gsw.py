@@ -1,95 +1,106 @@
-"""
-GSW (Gentry-Sahai-Waters) fully homomorphic encryption scheme.
-Simplified implementation for demonstration.
+"""GSW (Gentry-Sahai-Waters) fully homomorphic encryption scheme.
+
+Supports boolean (0/1) plaintexts with unlimited additions and
+a limited number of multiplications before noise overwhelms the signal.
 """
 
-import random
 import numpy as np
-from typing import List, Any
 
 from core.base import HEScheme, HEKeyPair
 
 
 class GSWScheme(HEScheme):
-    """GSW fully homomorphic encryption scheme."""
-    
-    def __init__(self, n: int = 32, q: int = 2**30, B: int = 2**15):
-        self.n = n      # LWE dimension
-        self.q = q      # modulus
-        self.B = B      # bound
+    """GSW fully homomorphic encryption scheme (boolean plaintexts)."""
+
+    def __init__(self, n: int = 4, q: int = 2**20, sigma: int = 1):
+        self.n = n
+        self.q = q
+        self.sigma = sigma
+        self.l = int(np.log2(q))
+        self.m = (n + 1) * self.l
         self._name = "GSW"
         self._noise_budgets = []
-    
+
+        # Key placeholders
+        self.s_orig = None
+        self.sk = None
+        self.G = None
+
     @property
     def name(self) -> str:
         return self._name
-    
-    def _sample_uniform(self, size: int) -> List[int]:
-        return [random.randrange(self.q) for _ in range(size)]
-    
-    def _sample_error(self, sigma: float = 3.2) -> int:
-        return int(np.random.normal(0, sigma)) % self.q
-    
+
+    def _bit_decomp_vector(self, v):
+        """Bit-decompose a vector into l bits per entry."""
+        res = []
+        for val in v:
+            val = int(val) % self.q
+            res.extend([(val >> i) & 1 for i in range(self.l)])
+        return np.array(res, dtype=np.int64)
+
+    def g_inv(self, M):
+        """G^{-1} : bit-decompose each column of M. Output shape: (m, m)."""
+        return np.column_stack(
+            [self._bit_decomp_vector(M[:, j]) for j in range(M.shape[1])]
+        )
+
     def keygen(self) -> HEKeyPair:
-        # Secret key (LWE secret)
-        s = [random.randrange(self.q) for _ in range(self.n)]
-        # Public key (A, b = A*s + e)
-        A = [self._sample_uniform(self.n) for _ in range(self.n)]
-        e = self._sample_error()
-        b = [(sum(A[i][j] * s[j] for j in range(self.n)) + e) % self.q 
-             for i in range(self.n)]
-        return HEKeyPair(public_key=(A, b), secret_key=s, context=None)
-    
-    def encrypt(self, plaintext: float, keypair: HEKeyPair) -> List[List[int]]:
-        A, b = keypair.public_key
-        m = int(plaintext)
-        C = []
-        for i in range(len(A)):
-            row = []
-            for j in range(len(A[i])):
-                r = random.randrange(2)
-                val = r * A[i][j]
-                row.append(val % self.q)
-            row[-1] = (row[-1] + m * (1 if i == len(A)-1 else 0)) % self.q
-            C.append(row)
+        s = np.random.randint(0, 2, size=self.n)
+        self.s_orig = s
+        # Secret key vector: sk = (-s, 1) so that sk^T · [A; b] = -sA + b ≈ e
+        self.sk = np.append(-s, 1)
+
+        # Gadget matrix G of shape (n+1, m)
+        self.G = np.zeros((self.n + 1, self.m), dtype=np.int64)
+        for i in range(self.n + 1):
+            for j in range(self.l):
+                self.G[i, i * self.l + j] = 1 << j
+
+        return HEKeyPair(
+            public_key={"n": self.n, "q": self.q, "m": self.m, "G": self.G},
+            secret_key=self.sk,
+            context={"s_orig": self.s_orig},
+        )
+
+    def encrypt(self, plaintext: float, keypair: HEKeyPair) -> np.ndarray:
+        m_val = int(plaintext)
+        n = keypair.public_key["n"]
+        q = keypair.public_key["q"]
+        m = keypair.public_key["m"]
+        G = keypair.public_key["G"]
+        s_orig = keypair.context["s_orig"]
+
+        A = np.random.randint(0, q, size=(n, m))
+        e = np.random.randint(-2, 3, size=m)
+        b = (A.T @ s_orig + e) % q
+        C = np.vstack([A, b])
+        C = (C + m_val * G) % q
         return C
-    
-    def decrypt(self, ciphertext: List[List[int]], keypair: HEKeyPair) -> float:
-        s = keypair.secret_key
-        n = len(s)
-        result = 0
-        for i in range(n):
-            result += ciphertext[i][i] * s[i]
-        result = result % self.q
-        # Simplified extraction
-        if result > self.q // 2:
-            result = 0
-        else:
-            result = 1
-        return float(result)
-    
-    def add(self, c1: List[List[int]], c2: List[List[int]], keypair: HEKeyPair) -> List[List[int]]:
-        n = len(c1)
-        result = []
-        for i in range(n):
-            row = []
-            for j in range(n):
-                row.append((c1[i][j] + c2[i][j]) % self.q)
-            result.append(row)
-        return result
-    
-    def multiply(self, c1: List[List[int]], c2: List[List[int]], keypair: HEKeyPair) -> List[List[int]]:
-        n = len(c1)
-        result = [[0] * n for _ in range(n)]
-        for i in range(n):
-            for j in range(n):
-                total = 0
-                for k in range(n):
-                    total += c1[i][k] * c2[k][j]
-                result[i][j] = total % self.q
-        return result
-    
-    def get_noise_budget(self, ciphertext: Any) -> float:
-        noise_est = sum(sum(abs(v) for v in row) for row in ciphertext) / (self.q * len(ciphertext))
+
+    def decrypt(self, ciphertext: np.ndarray, keypair: HEKeyPair) -> float:
+        sk = keypair.secret_key
+        q = keypair.public_key["q"]
+        v = (sk @ ciphertext) % q
+        val = v[-1]
+        if abs(val - q // 2) < q // 4:
+            return 1.0
+        return 0.0
+
+    def add(
+        self, c1: np.ndarray, c2: np.ndarray, keypair: HEKeyPair
+    ) -> np.ndarray:
+        q = keypair.public_key["q"]
+        return (c1 + c2) % q
+
+    def multiply(
+        self, c1: np.ndarray, c2: np.ndarray, keypair: HEKeyPair
+    ) -> np.ndarray:
+        q = keypair.public_key["q"]
+        Ginv = self.g_inv(c2)
+        return (c1 @ Ginv) % q
+
+    def get_noise_budget(self, ciphertext) -> float:
+        q = ciphertext.shape[0]
+        noise_est = float(np.sum(np.abs(ciphertext))) / (q * 1000.0)
         self._noise_budgets.append(noise_est)
         return noise_est

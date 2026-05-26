@@ -17,8 +17,7 @@ class MultiplicativeExperiment(BaseExperiment):
     
     def __init__(self, num_routers: int = 8, num_fields: int = 2):
         super().__init__(num_routers, num_fields)
-        # Only include RSA and ElGamal; BGV/BFV/CKKS/GSW require additional libs or are unstable
-        self.multiplicative_schemes = ['RSA', 'ElGamal']
+        self.multiplicative_schemes = ['RSA', 'ElGamal', 'BGV', 'BFV', 'CKKS', 'GSW']
     
     def _generate_router_operations(self) -> List[List[RoutingOperation]]:
         """Generate only multiplication operations (no addition)."""

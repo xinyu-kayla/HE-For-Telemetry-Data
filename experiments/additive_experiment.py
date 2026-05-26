@@ -17,8 +17,7 @@ class AdditiveExperiment(BaseExperiment):
     
     def __init__(self, num_routers: int = 10, num_fields: int = 2):
         super().__init__(num_routers, num_fields)
-        # Only include schemes that are likely to work without heavy dependencies
-        self.additive_schemes = ['Paillier', 'BGN']  # BGV/BFV/CKKS/GSW require Pyfhel
+        self.additive_schemes = ['Paillier', 'BGN', 'BGV', 'BFV', 'CKKS', 'GSW']
     
     def _generate_router_operations(self) -> List[List[RoutingOperation]]:
         ops_per_router = []

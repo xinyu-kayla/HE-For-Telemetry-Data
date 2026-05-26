@@ -1,0 +1,17 @@
+[
+  {
+    "scheme_name": "CKKS",
+    "num_hops": 6,
+    "operations_per_hop": 1,
+    "success": false,
+    "failure_reason": "<Pyfhel ERROR> wrong scheme type in PyCtxt when decrypting",
+    "final_computed": 18.93089574735343,
+    "final_expected": 18.93089574686388,
+    "final_error": 4.895497340839938e-10,
+    "final_relative_error": 2.5859829383007798e-11,
+    "mean_absolute_error": 4.895497340839938e-10,
+    "max_absolute_error": 4.895497340839938e-10,
+    "mean_latency": 0.03529020003043115,
+    "total_latency": 0.03529020003043115
+  }
+]
