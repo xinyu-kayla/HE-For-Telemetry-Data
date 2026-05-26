@@ -15,9 +15,7 @@ class BGVScheme(HEScheme):
             from Pyfhel import Pyfhel
             self.Pyfhel = Pyfhel
         except ImportError:
-            raise ImportError(
-                "Pyfhel is required for BGV. Install with: pip install Pyfhel"
-            )
+            raise ImportError("Pyfhel is required for BGV. Install with: pip install Pyfhel")
 
     @property
     def name(self) -> str:
@@ -34,16 +32,14 @@ class BGVScheme(HEScheme):
     def encrypt(self, plaintext: float, keypair: HEKeyPair):
         if self._he is None:
             self._he = keypair.public_key
-        pt_int = int(plaintext)
-        return self._he.encrypt(pt_int)    # 直接传整数，Pyfhel 3.x 支持
+        return self._he.encrypt(np.array([int(plaintext)], dtype=np.int64))
 
     def decrypt(self, ciphertext, keypair: HEKeyPair) -> float:
         if self._he is None:
             self._he = keypair.secret_key
         res = self._he.decrypt(ciphertext)
-        # 解密返回单个整数或列表，统一处理
         if isinstance(res, (list, np.ndarray)):
-            return float(res[-1])   # 取最后一个槽（通常包含有效值）
+            return float(res[0]) if len(res) > 0 else 0.0
         return float(res)
 
     def add(self, c1, c2, keypair: HEKeyPair):

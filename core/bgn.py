@@ -45,25 +45,18 @@ class BGNScheme(HEScheme):
     def decrypt(self, ciphertext: Tuple[int, int], keypair: HEKeyPair) -> float:
         q, g, sk = keypair.secret_key
         c1, c2 = ciphertext
-        # Recover g^m mod q
         g_m = (c2 * pow(c1, -sk, q)) % q
-        # Brute-force discrete log (adjust range for your telemetry range)
-        for m_test in range(100000):   # up to 100000
+        for m_test in range(200000):
             if pow(g, m_test, q) == g_m:
                 return float(m_test)
-        # Fallback: return a clearly wrong value to signal failure
         return -1.0
 
-    def add(
-        self, c1: Tuple[int, int], c2: Tuple[int, int], keypair: HEKeyPair
-    ) -> Tuple[int, int]:
+    def add(self, c1: Tuple[int, int], c2: Tuple[int, int], keypair: HEKeyPair) -> Tuple[int, int]:
         q, _, _ = keypair.public_key
         return ((c1[0] * c2[0]) % q, (c1[1] * c2[1]) % q)
 
     def multiply(self, c1, c2, keypair: HEKeyPair):
-        raise NotImplementedError(
-            "BGN multiplication requires bilinear pairing environment"
-        )
+        raise NotImplementedError("BGN multiplication requires bilinear pairing environment")
 
     def supports_multiplicative(self) -> bool:
         return False

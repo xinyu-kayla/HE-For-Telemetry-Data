@@ -15,9 +15,7 @@ class BFVScheme(HEScheme):
             from Pyfhel import Pyfhel
             self.Pyfhel = Pyfhel
         except ImportError:
-            raise ImportError(
-                "Pyfhel is required for BFV. Install with: pip install Pyfhel"
-            )
+            raise ImportError("Pyfhel is required for BFV. Install with: pip install Pyfhel")
 
     @property
     def name(self) -> str:
@@ -35,16 +33,14 @@ class BFVScheme(HEScheme):
     def encrypt(self, plaintext: float, keypair: HEKeyPair):
         if self._he is None:
             self._he = keypair.public_key
-        pt_int = int(plaintext)
-        return self._he.encrypt(pt_int)   # 直接传整数
+        return self._he.encrypt(np.array([int(plaintext)], dtype=np.int64))
 
     def decrypt(self, ciphertext, keypair: HEKeyPair) -> float:
         if self._he is None:
             self._he = keypair.secret_key
         res = self._he.decrypt(ciphertext)
         if isinstance(res, (list, np.ndarray)):
-            # 取最后一个元素（某些版本中有效值在最后）
-            return float(res[-1]) if len(res) > 0 else 0.0
+            return float(np.max(res)) if len(res) > 0 else 0.0
         return float(res)
 
     def add(self, c1, c2, keypair: HEKeyPair):

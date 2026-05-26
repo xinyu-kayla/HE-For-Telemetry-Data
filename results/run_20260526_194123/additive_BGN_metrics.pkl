@@ -1,0 +1,17 @@
+[
+  {
+    "scheme_name": "BGN",
+    "num_hops": 12,
+    "operations_per_hop": 1,
+    "success": true,
+    "failure_reason": "",
+    "final_computed": 94.0,
+    "final_expected": 101.34833578257046,
+    "final_error": 7.348335782570459,
+    "final_relative_error": 0.07250573702885559,
+    "mean_absolute_error": 4.32414393522948,
+    "max_absolute_error": 7.348335782570459,
+    "mean_latency": 0.00048258333117701113,
+    "total_latency": 0.005790999974124134
+  }
+]

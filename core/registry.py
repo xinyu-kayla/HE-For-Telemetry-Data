@@ -10,7 +10,6 @@ from core.ckks import CKKSScheme
 from core.bgn import BGNScheme
 from core.gsw import GSWScheme
 
-
 _SCHEMES = {
     'RSA': RSAScheme,
     'ElGamal': ElGamalScheme,

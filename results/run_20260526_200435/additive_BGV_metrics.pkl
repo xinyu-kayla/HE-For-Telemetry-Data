@@ -1,0 +1,17 @@
+[
+  {
+    "scheme_name": "BGV",
+    "num_hops": 12,
+    "operations_per_hop": 1,
+    "success": true,
+    "failure_reason": "",
+    "final_computed": 0.0,
+    "final_expected": 108.24435999352053,
+    "final_error": 108.24435999352053,
+    "final_relative_error": 0.9999999999990762,
+    "mean_absolute_error": 77.48433824058547,
+    "max_absolute_error": 108.24435999352053,
+    "mean_latency": 0.004923658319360887,
+    "total_latency": 0.059083899832330644
+  }
+]

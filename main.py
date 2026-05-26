@@ -133,7 +133,6 @@ def main():
         collector_multiplicative = multiplicative_exp.run_suite(
             num_runs_per_scheme=num_runs,
             initial_value=config.INITIAL_TELEMETRY_MULTIPLICATIVE,
-            secondary_value=config.SECONDARY_TELEMETRY_MULTIPLICATIVE,
             show_progress=True,
         )
         print_experiment_summary(collector_multiplicative, "Multiplicative Group")

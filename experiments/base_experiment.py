@@ -1,7 +1,7 @@
 """Base class for homomorphic encryption experiments."""
 
 import numpy as np
-from typing import List, Optional
+from typing import List
 from abc import ABC, abstractmethod
 
 from core.base import HEScheme
@@ -11,44 +11,41 @@ from metrics.collector import MetricsCollector
 
 class BaseExperiment(ABC):
     """Base class for additive/multiplicative experiments."""
-    
+
     def __init__(self, num_routers: int, num_fields: int):
         self.num_routers = num_routers
         self.num_fields = num_fields
         self.collector = MetricsCollector()
-    
+
     @abstractmethod
     def _generate_router_operations(self) -> List[List[RoutingOperation]]:
         pass
-    
+
     @abstractmethod
     def _compute_expected_values(self, initial_value: float,
                                  router_operations: List[List[RoutingOperation]]) -> List[float]:
         pass
-    
+
     @abstractmethod
-    def run_single_experiment(self, scheme: HEScheme,
-                              initial_value: float,
-                              router_operations: List[List[RoutingOperation]],
-                              run_id: int = 0):
+    def run_single_experiment(self, scheme: HEScheme, initial_value: float,
+                              router_operations: List[List[RoutingOperation]], run_id: int = 0):
         pass
-    
+
     def run_suite(self, num_runs_per_scheme: int, initial_value: float,
                   schemes: List[str], show_progress: bool = True) -> MetricsCollector:
         np.random.seed(42)
         from core.registry import get_scheme
         from tqdm import tqdm
-        
+
         schemes_to_run = {}
         for name in schemes:
             try:
                 schemes_to_run[name] = get_scheme(name)
             except Exception as e:
                 print(f"Warning: Could not initialize {name}: {e}")
-        
+
         total = len(schemes_to_run) * num_runs_per_scheme
         iterator = tqdm(range(total), desc=f"{self.__class__.__name__}") if show_progress else range(total)
-        
         run_idx = 0
         for name, scheme in schemes_to_run.items():
             for _ in range(num_runs_per_scheme):

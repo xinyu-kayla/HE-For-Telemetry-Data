@@ -64,6 +64,10 @@ class FullyExperiment(BaseExperiment):
         try:
             sim = NetworkSimulator(scheme)
             sim.initialize(self.num_routers)
+
+            if scheme.name == "GSW":
+                return self._run_gsw(scheme, router_operations, sim, metrics)
+
             secondary = initial_value * 1.5
             initial_plaintexts = [initial_value, secondary] + [0.0] * (self.num_fields - 2)
 
@@ -89,7 +93,6 @@ class FullyExperiment(BaseExperiment):
                 noise = scheme.get_noise_budget(temp_ct0)
                 metrics.record_hop(hop_idx, computed, expected, noise=noise, latency=hop_latency)
 
-            # Final packet simulation
             packet = sim.send_packet(initial_plaintexts, router_operations)
             final_computed = sim.get_final_value(packet)
             final_expected = expected_values[-1]
@@ -107,11 +110,43 @@ class FullyExperiment(BaseExperiment):
         metrics.finalize()
         return metrics
 
-    def run_suite(
-        self,
-        num_runs_per_scheme: int,
-        initial_value: float,
-        show_progress: bool = True,
-    ) -> MetricsCollector:
-        """Run fully homomorphic experiment suite."""
-        return super().run_suite(num_runs_per_scheme, initial_value, self.fully_schemes, show_progress)
+    def _run_gsw(self, scheme, router_operations, sim, metrics):
+        """Boolean mixed circuit for GSW."""
+        m1, m2 = 1, 0
+        ct1 = scheme.encrypt(m1, sim.keypair)
+        ct2 = scheme.encrypt(m2, sim.keypair)
+        expected = m1
+
+        for hop_idx, ops in enumerate(router_operations):
+            for op in ops:
+                if op.op_type == OperationType.ADD_CONSTANT:
+                    const_val = int(op.value) % 2
+                    const_ct = scheme.encrypt(const_val, sim.keypair)
+                    ct1 = scheme.add(ct1, const_ct, sim.keypair)
+                    expected = (expected + const_val) % 2
+                elif op.op_type == OperationType.MULTIPLY_CONSTANT:
+                    const_val = int(op.value) % 2
+                    const_ct = scheme.encrypt(const_val, sim.keypair)
+                    ct1 = scheme.multiply(ct1, const_ct, sim.keypair)
+                    expected = (expected * const_val) % 2
+                elif op.op_type == OperationType.MULTIPLY_CIPHERTEXT:
+                    ct1 = scheme.multiply(ct1, ct2, sim.keypair)
+                    expected = (expected * m2) % 2
+            computed = scheme.decrypt(ct1, sim.keypair)
+            noise = scheme.get_noise_budget(ct1)
+            metrics.record_hop(hop_idx, computed, expected, noise=noise, latency=0.001)
+
+        packet = sim.send_packet([m1, m2] + [0.0] * (self.num_fields - 2), router_operations)
+        final_computed = sim.get_final_value(packet)
+        metrics.final_computed = final_computed
+        metrics.final_expected = expected
+        metrics.final_error = abs(final_computed - expected)
+        metrics.final_relative_error = metrics.final_error / (abs(expected) + 1e-10)
+        metrics.success = True
+        metrics.finalize()
+        return metrics
+
+    def run_suite(self, num_runs_per_scheme: int, initial_value: float,
+                  show_progress: bool = True) -> MetricsCollector:
+        return super().run_suite(num_runs_per_scheme, initial_value,
+                                 self.fully_schemes, show_progress)

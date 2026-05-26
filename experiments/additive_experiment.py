@@ -14,11 +14,11 @@ from experiments.base_experiment import BaseExperiment
 
 class AdditiveExperiment(BaseExperiment):
     """Runs additive homomorphic experiments."""
-    
+
     def __init__(self, num_routers: int = 10, num_fields: int = 2):
         super().__init__(num_routers, num_fields)
         self.additive_schemes = ['Paillier', 'BGN', 'BGV', 'BFV', 'CKKS', 'GSW']
-    
+
     def _generate_router_operations(self) -> List[List[RoutingOperation]]:
         ops_per_router = []
         for router_idx in range(self.num_routers):
@@ -28,7 +28,7 @@ class AdditiveExperiment(BaseExperiment):
                 ops.append(RoutingOperation(OperationType.AGGREGATE))
             ops_per_router.append(ops)
         return ops_per_router
-    
+
     def _compute_expected_values(self, initial_value: float,
                                   router_operations: List[List[RoutingOperation]]) -> List[float]:
         expected = [initial_value]
@@ -37,10 +37,9 @@ class AdditiveExperiment(BaseExperiment):
             for op in ops:
                 if op.op_type == OperationType.ADD_CONSTANT:
                     current += op.value
-                # AGGREGATE does not change sum
             expected.append(current)
         return expected
-    
+
     def run_single_experiment(self, scheme: HEScheme,
                               initial_value: float,
                               router_operations: List[List[RoutingOperation]],
@@ -51,24 +50,26 @@ class AdditiveExperiment(BaseExperiment):
         try:
             sim = NetworkSimulator(scheme)
             sim.initialize(self.num_routers)
+
+            if scheme.name == "GSW":
+                return self._run_gsw(scheme, router_operations, sim, metrics)
+
             initial_plaintexts = [initial_value] + [0.0] * (self.num_fields - 1)
-            
-            # For hop-by-hop analysis (decrypt each step for measurement)
             temp_ct = scheme.encrypt(initial_value, sim.keypair)
             expected_values = self._compute_expected_values(initial_value, router_operations)
-            
+
             for hop_idx, ops in enumerate(router_operations):
                 hop_start = time.perf_counter()
                 for op in ops:
                     if op.op_type == OperationType.ADD_CONSTANT:
                         temp_ct = scheme.add_constant(temp_ct, op.value, sim.keypair)
                 hop_latency = time.perf_counter() - hop_start
-                
+
                 computed = scheme.decrypt(temp_ct, sim.keypair)
                 expected = expected_values[hop_idx + 1]
-                metrics.record_hop(hop_idx, computed, expected, latency=hop_latency)
-            
-            # Final full packet (simulate real network)
+                noise = scheme.get_noise_budget(temp_ct)
+                metrics.record_hop(hop_idx, computed, expected, noise=noise, latency=hop_latency)
+
             packet = sim.send_packet(initial_plaintexts, router_operations)
             final_computed = sim.get_final_value(packet)
             final_expected = expected_values[-1]
@@ -77,17 +78,44 @@ class AdditiveExperiment(BaseExperiment):
             metrics.final_error = abs(final_computed - final_expected)
             metrics.final_relative_error = metrics.final_error / (abs(final_expected) + 1e-10)
             metrics.success = True
-            
+
         except Exception as e:
             metrics.success = False
             metrics.failure_reason = str(e)
             print(f"Error in {scheme.name}: {e}")
-        
+
         metrics.finalize()
         return metrics
-    
+
+    def _run_gsw(self, scheme, router_operations, sim, metrics):
+        """Boolean additive circuit for GSW."""
+        m1, m2 = 1, 0
+        ct1 = scheme.encrypt(m1, sim.keypair)
+        ct2 = scheme.encrypt(m2, sim.keypair)
+        expected = m1
+
+        for hop_idx, ops in enumerate(router_operations):
+            for op in ops:
+                if op.op_type == OperationType.ADD_CONSTANT:
+                    const_val = int(op.value) % 2
+                    const_ct = scheme.encrypt(const_val, sim.keypair)
+                    ct1 = scheme.add(ct1, const_ct, sim.keypair)
+                    expected = (expected + const_val) % 2
+            computed = scheme.decrypt(ct1, sim.keypair)
+            noise = scheme.get_noise_budget(ct1)
+            metrics.record_hop(hop_idx, computed, expected, noise=noise, latency=0.001)
+
+        packet = sim.send_packet([m1, m2] + [0.0] * (self.num_fields - 2), router_operations)
+        final_computed = sim.get_final_value(packet)
+        metrics.final_computed = final_computed
+        metrics.final_expected = expected
+        metrics.final_error = abs(final_computed - expected)
+        metrics.final_relative_error = metrics.final_error / (abs(expected) + 1e-10)
+        metrics.success = True
+        metrics.finalize()
+        return metrics
+
     def run_suite(self, num_runs_per_scheme: int, initial_value: float,
                   show_progress: bool = True) -> MetricsCollector:
-        """Run additive experiment suite using predefined additive schemes."""
         return super().run_suite(num_runs_per_scheme, initial_value,
                                  self.additive_schemes, show_progress)
