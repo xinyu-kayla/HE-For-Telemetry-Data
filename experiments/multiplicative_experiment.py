@@ -22,7 +22,7 @@ class MultiplicativeExperiment(BaseExperiment):
     def _generate_router_operations(self) -> List[List[RoutingOperation]]:
         ops_per_router = []
         for _ in range(self.num_routers):
-            factor = np.random.uniform(0.95, 1.05)   # stable growth
+            factor = np.random.uniform(0.95, 1.05)
             ops = [RoutingOperation(OperationType.MULTIPLY_CONSTANT, factor)]
             ops_per_router.append(ops)
         return ops_per_router
@@ -53,7 +53,7 @@ class MultiplicativeExperiment(BaseExperiment):
                 return self._run_gsw(scheme, router_operations, sim, metrics)
 
             initial_plaintexts = [initial_value] + [1.0] * (self.num_fields - 1)
-            temp_ct0 = scheme.encrypt(initial_value, sim.keypair)
+            temp_ct = scheme.encrypt(initial_value, sim.keypair)
             expected_values = self._compute_expected_values(initial_value, router_operations)
 
             for hop_idx, ops in enumerate(router_operations):
@@ -61,12 +61,12 @@ class MultiplicativeExperiment(BaseExperiment):
                 for op in ops:
                     if op.op_type == OperationType.MULTIPLY_CONSTANT:
                         if scheme.supports_multiplicative():
-                            temp_ct0 = scheme.multiply_constant(temp_ct0, op.value, sim.keypair)
+                            temp_ct = scheme.multiply_constant(temp_ct, op.value, sim.keypair)
                 hop_latency = time.perf_counter() - hop_start
 
-                computed = scheme.decrypt(temp_ct0, sim.keypair)
+                computed = scheme.decrypt(temp_ct, sim.keypair)
                 expected = expected_values[hop_idx + 1]
-                noise = scheme.get_noise_budget(temp_ct0)
+                noise = scheme.get_noise_budget(temp_ct)
                 metrics.record_hop(hop_idx, computed, expected, noise=noise, latency=hop_latency)
 
             packet = sim.send_packet(initial_plaintexts, router_operations)

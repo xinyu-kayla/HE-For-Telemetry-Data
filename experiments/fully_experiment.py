@@ -67,22 +67,22 @@ class FullyExperiment(BaseExperiment):
                 return self._run_gsw(scheme, router_operations, sim, metrics)
 
             initial_plaintexts = [initial_value] + [0.0] * (self.num_fields - 1)
-            temp_ct0 = scheme.encrypt(initial_value, sim.keypair)
+            temp_ct = scheme.encrypt(initial_value, sim.keypair)
             expected_values = self._compute_expected_values(initial_value, router_operations)
 
             for hop_idx, ops in enumerate(router_operations):
                 hop_start = time.perf_counter()
                 for op in ops:
                     if op.op_type == OperationType.ADD_CONSTANT:
-                        temp_ct0 = scheme.add_constant(temp_ct0, op.value, sim.keypair)
+                        temp_ct = scheme.add_constant(temp_ct, op.value, sim.keypair)
                     elif op.op_type == OperationType.MULTIPLY_CONSTANT:
                         if scheme.supports_multiplicative():
-                            temp_ct0 = scheme.multiply_constant(temp_ct0, op.value, sim.keypair)
+                            temp_ct = scheme.multiply_constant(temp_ct, op.value, sim.keypair)
                 hop_latency = time.perf_counter() - hop_start
 
-                computed = scheme.decrypt(temp_ct0, sim.keypair)
+                computed = scheme.decrypt(temp_ct, sim.keypair)
                 expected = expected_values[hop_idx + 1]
-                noise = scheme.get_noise_budget(temp_ct0)
+                noise = scheme.get_noise_budget(temp_ct)
                 metrics.record_hop(hop_idx, computed, expected, noise=noise, latency=hop_latency)
 
             packet = sim.send_packet(initial_plaintexts, router_operations)

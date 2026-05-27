@@ -1,0 +1,17 @@
+[
+  {
+    "scheme_name": "BFV",
+    "num_hops": 3,
+    "operations_per_hop": 1,
+    "success": false,
+    "failure_reason": "result ciphertext is transparent",
+    "final_computed": 23.0,
+    "final_expected": 23.667162723303385,
+    "final_error": 0.6671627233033846,
+    "final_relative_error": 0.02818938337055745,
+    "mean_absolute_error": 0.6671627233033846,
+    "max_absolute_error": 0.6671627233033846,
+    "mean_latency": 0.004563800059258938,
+    "total_latency": 0.004563800059258938
+  }
+]
