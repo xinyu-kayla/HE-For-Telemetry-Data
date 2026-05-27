@@ -1,0 +1,47 @@
+[
+  {
+    "scheme_name": "ElGamal",
+    "num_hops": 10,
+    "operations_per_hop": 1,
+    "success": true,
+    "failure_reason": "",
+    "final_computed": 0.0,
+    "final_expected": 0.0,
+    "final_error": 0.0,
+    "final_relative_error": 0.0,
+    "mean_absolute_error": 0.0,
+    "max_absolute_error": 0.0,
+    "mean_latency": 7.579999510198831e-06,
+    "total_latency": 7.579999510198832e-05
+  },
+  {
+    "scheme_name": "ElGamal",
+    "num_hops": 10,
+    "operations_per_hop": 1,
+    "success": true,
+    "failure_reason": "",
+    "final_computed": 0.0,
+    "final_expected": -0.0,
+    "final_error": 0.0,
+    "final_relative_error": 0.0,
+    "mean_absolute_error": 3937.1,
+    "max_absolute_error": 39371.0,
+    "mean_latency": 5.690008401870728e-06,
+    "total_latency": 5.6900084018707275e-05
+  },
+  {
+    "scheme_name": "ElGamal",
+    "num_hops": 10,
+    "operations_per_hop": 1,
+    "success": true,
+    "failure_reason": "",
+    "final_computed": 0.0,
+    "final_expected": 0.0,
+    "final_error": 0.0,
+    "final_relative_error": 0.0,
+    "mean_absolute_error": 0.0,
+    "max_absolute_error": 0.0,
+    "mean_latency": 5.5799959227442745e-06,
+    "total_latency": 5.579995922744274e-05
+  }
+]

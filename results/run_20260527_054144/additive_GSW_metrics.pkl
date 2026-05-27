@@ -1,0 +1,17 @@
+[
+  {
+    "scheme_name": "GSW",
+    "num_hops": 12,
+    "operations_per_hop": 1,
+    "success": true,
+    "failure_reason": "",
+    "final_computed": 0.0,
+    "final_expected": 8.0,
+    "final_error": 8.0,
+    "final_relative_error": 0.9999999999875,
+    "mean_absolute_error": 3.1666666666666665,
+    "max_absolute_error": 8.0,
+    "mean_latency": 9.588331643802424e-05,
+    "total_latency": 0.001150599797256291
+  }
+]

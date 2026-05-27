@@ -1,0 +1,47 @@
+[
+  {
+    "scheme_name": "CKKS",
+    "num_hops": 10,
+    "operations_per_hop": 1,
+    "success": true,
+    "failure_reason": "",
+    "final_computed": 12.915356178435406,
+    "final_expected": 12.915201231883717,
+    "final_error": 0.0001549465516887949,
+    "final_relative_error": 1.1997223187284074e-05,
+    "mean_absolute_error": 4.795223779914259e-05,
+    "max_absolute_error": 0.0001549465516887949,
+    "mean_latency": 0.02513318001292646,
+    "total_latency": 0.2513318001292646
+  },
+  {
+    "scheme_name": "CKKS",
+    "num_hops": 10,
+    "operations_per_hop": 1,
+    "success": true,
+    "failure_reason": "",
+    "final_computed": 27.244165474580903,
+    "final_expected": 27.24362998897947,
+    "final_error": 0.0005354856014321285,
+    "final_relative_error": 1.9655442451933768e-05,
+    "mean_absolute_error": 0.00019037362123448532,
+    "max_absolute_error": 0.0005354856014321285,
+    "mean_latency": 0.024957010021898894,
+    "total_latency": 0.24957010021898896
+  },
+  {
+    "scheme_name": "CKKS",
+    "num_hops": 10,
+    "operations_per_hop": 1,
+    "success": true,
+    "failure_reason": "",
+    "final_computed": 23.758988039394147,
+    "final_expected": 23.758615429197178,
+    "final_error": 0.0003726101969689921,
+    "final_relative_error": 1.5683161254822946e-05,
+    "mean_absolute_error": 0.00012309766733462624,
+    "max_absolute_error": 0.0003726101969689921,
+    "mean_latency": 0.024964219995308668,
+    "total_latency": 0.24964219995308667
+  }
+]

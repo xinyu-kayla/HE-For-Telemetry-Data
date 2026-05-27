@@ -1,0 +1,47 @@
+[
+  {
+    "scheme_name": "BGV",
+    "num_hops": 10,
+    "operations_per_hop": 1,
+    "success": false,
+    "failure_reason": "end of modulus switching chain reached",
+    "final_computed": 11.0,
+    "final_expected": 11.0,
+    "final_error": 0.0,
+    "final_relative_error": 0.0,
+    "mean_absolute_error": 0.0,
+    "max_absolute_error": 0.0,
+    "mean_latency": 0.001977366666930417,
+    "total_latency": 0.005932100000791252
+  },
+  {
+    "scheme_name": "BGV",
+    "num_hops": 10,
+    "operations_per_hop": 1,
+    "success": false,
+    "failure_reason": "end of modulus switching chain reached",
+    "final_computed": 22.0,
+    "final_expected": 22.0,
+    "final_error": 0.0,
+    "final_relative_error": 0.0,
+    "mean_absolute_error": 0.0,
+    "max_absolute_error": 0.0,
+    "mean_latency": 0.0020720333171387515,
+    "total_latency": 0.006216099951416254
+  },
+  {
+    "scheme_name": "BGV",
+    "num_hops": 10,
+    "operations_per_hop": 1,
+    "success": false,
+    "failure_reason": "result ciphertext is transparent",
+    "final_computed": 15.0,
+    "final_expected": 15.0,
+    "final_error": 0.0,
+    "final_relative_error": 0.0,
+    "mean_absolute_error": 0.0,
+    "max_absolute_error": 0.0,
+    "mean_latency": 0.0047716000117361546,
+    "total_latency": 0.0047716000117361546
+  }
+]

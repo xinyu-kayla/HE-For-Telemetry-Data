@@ -1,0 +1,47 @@
+[
+  {
+    "scheme_name": "BFV",
+    "num_hops": 10,
+    "operations_per_hop": 1,
+    "success": true,
+    "failure_reason": "",
+    "final_computed": 85.0,
+    "final_expected": 85.0,
+    "final_error": 0.0,
+    "final_relative_error": 0.0,
+    "mean_absolute_error": 0.0,
+    "max_absolute_error": 0.0,
+    "mean_latency": 0.006041140004526824,
+    "total_latency": 0.06041140004526824
+  },
+  {
+    "scheme_name": "BFV",
+    "num_hops": 10,
+    "operations_per_hop": 1,
+    "success": true,
+    "failure_reason": "",
+    "final_computed": 111.0,
+    "final_expected": 111.0,
+    "final_error": 0.0,
+    "final_relative_error": 0.0,
+    "mean_absolute_error": 0.0,
+    "max_absolute_error": 0.0,
+    "mean_latency": 0.005974129994865507,
+    "total_latency": 0.05974129994865507
+  },
+  {
+    "scheme_name": "BFV",
+    "num_hops": 10,
+    "operations_per_hop": 1,
+    "success": true,
+    "failure_reason": "",
+    "final_computed": 96.0,
+    "final_expected": 96.0,
+    "final_error": 0.0,
+    "final_relative_error": 0.0,
+    "mean_absolute_error": 0.0,
+    "max_absolute_error": 0.0,
+    "mean_latency": 0.007093320006970316,
+    "total_latency": 0.07093320006970316
+  }
+]

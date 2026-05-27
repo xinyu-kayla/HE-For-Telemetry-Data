@@ -10,6 +10,7 @@ from core.network import NetworkSimulator
 from metrics.experiment_metrics import ExperimentMetrics
 from metrics.collector import MetricsCollector
 from experiments.base_experiment import BaseExperiment
+import config
 
 
 class AdditiveExperiment(BaseExperiment):
@@ -22,8 +23,8 @@ class AdditiveExperiment(BaseExperiment):
     def _generate_router_operations(self) -> List[List[RoutingOperation]]:
         ops_per_router = []
         for router_idx in range(self.num_routers):
-            measurement = np.random.uniform(1, 10)
-            ops = [RoutingOperation(OperationType.ADD_CONSTANT, measurement)]
+            raw_val = np.random.uniform(1, 10)
+            ops = [RoutingOperation(OperationType.ADD_CONSTANT, raw_val)]
             if router_idx % 3 == 2:
                 ops.append(RoutingOperation(OperationType.AGGREGATE))
             ops_per_router.append(ops)
@@ -47,18 +48,30 @@ class AdditiveExperiment(BaseExperiment):
         metrics = ExperimentMetrics(scheme_name=scheme.name,
                                     num_hops=self.num_routers,
                                     operations_per_hop=1)
+
+        if scheme.name == "GSW":
+            return self._run_gsw(scheme, router_operations, run_id)
+
         try:
             sim = NetworkSimulator(scheme)
             sim.initialize(self.num_routers)
 
-            if scheme.name == "GSW":
-                return self._run_gsw(scheme, router_operations, sim, metrics)
+            adapted_ops = []
+            for ops in router_operations:
+                adapted = []
+                for op in ops:
+                    if op.op_type == OperationType.ADD_CONSTANT:
+                        adapted_val = self._adapt_value_for_scheme(op.value, scheme)
+                        adapted.append(RoutingOperation(OperationType.ADD_CONSTANT, adapted_val))
+                    else:
+                        adapted.append(op)
+                adapted_ops.append(adapted)
 
             initial_plaintexts = [initial_value] + [0.0] * (self.num_fields - 1)
             temp_ct = scheme.encrypt(initial_value, sim.keypair)
-            expected_values = self._compute_expected_values(initial_value, router_operations)
+            expected_values = self._compute_expected_values(initial_value, adapted_ops)
 
-            for hop_idx, ops in enumerate(router_operations):
+            for hop_idx, ops in enumerate(adapted_ops):
                 hop_start = time.perf_counter()
                 for op in ops:
                     if op.op_type == OperationType.ADD_CONSTANT:
@@ -87,35 +100,62 @@ class AdditiveExperiment(BaseExperiment):
         metrics.finalize()
         return metrics
 
-    def _run_gsw(self, scheme, router_operations, sim, metrics):
+    def _run_gsw(self, scheme, router_operations, run_id=0):
         """Boolean additive circuit for GSW."""
-        m1, m2 = 1, 0
-        ct1 = scheme.encrypt(m1, sim.keypair)
-        ct2 = scheme.encrypt(m2, sim.keypair)
-        expected = m1
+        metrics = ExperimentMetrics(scheme_name=scheme.name,
+                                    num_hops=self.num_routers,
+                                    operations_per_hop=1)
+        try:
+            sim = NetworkSimulator(scheme)
+            sim.initialize(self.num_routers)
 
-        for hop_idx, ops in enumerate(router_operations):
-            for op in ops:
-                if op.op_type == OperationType.ADD_CONSTANT:
-                    const_val = int(op.value) % 2
-                    const_ct = scheme.encrypt(const_val, sim.keypair)
-                    ct1 = scheme.add(ct1, const_ct, sim.keypair)
-                    expected = (expected + const_val) % 2
-            computed = scheme.decrypt(ct1, sim.keypair)
-            noise = scheme.get_noise_budget(ct1)
-            metrics.record_hop(hop_idx, computed, expected, noise=noise, latency=0.001)
+            m1, m2 = 1, 0
+            ct1 = scheme.encrypt(m1, sim.keypair)
+            ct2 = scheme.encrypt(m2, sim.keypair)
+            expected = m1
+            correct_hops = 0
+            total_hops = 0
 
-        packet = sim.send_packet([m1, m2] + [0.0] * (self.num_fields - 2), router_operations)
-        final_computed = sim.get_final_value(packet)
-        metrics.final_computed = final_computed
-        metrics.final_expected = expected
-        metrics.final_error = abs(final_computed - expected)
-        metrics.final_relative_error = metrics.final_error / (abs(expected) + 1e-10)
-        metrics.success = True
+            for hop_idx, ops in enumerate(router_operations):
+                for op in ops:
+                    if op.op_type == OperationType.ADD_CONSTANT:
+                        const_val = int(op.value) % 2
+                        const_ct = scheme.encrypt(const_val, sim.keypair)
+                        ct1 = scheme.add(ct1, const_ct, sim.keypair)
+                        expected = (expected + const_val) % 2
+                computed = scheme.decrypt(ct1, sim.keypair)
+                noise = scheme.get_noise_budget(ct1)
+                bit_match = (int(computed) == expected)
+                if bit_match:
+                    correct_hops += 1
+                total_hops += 1
+                metrics.record_hop(hop_idx, computed, expected,
+                                   noise=noise, latency=0.001)
+
+            packet = sim.send_packet([m1, m2] + [0.0]*(self.num_fields-2),
+                                     router_operations)
+            final_computed = sim.get_final_value(packet)
+            metrics.final_computed = final_computed
+            metrics.final_expected = expected
+            metrics.final_error = abs(final_computed - expected)
+            metrics.final_relative_error = metrics.final_error / (abs(expected) + 1e-10)
+            metrics.success = True
+            metrics.gsw_bit_accuracy = correct_hops / total_hops if total_hops > 0 else 0.0
+        except Exception as e:
+            metrics.success = False
+            metrics.failure_reason = str(e)
+            print(f"Error in GSW: {e}")
         metrics.finalize()
         return metrics
 
     def run_suite(self, num_runs_per_scheme: int, initial_value: float,
                   show_progress: bool = True) -> MetricsCollector:
-        return super().run_suite(num_runs_per_scheme, initial_value,
-                                 self.additive_schemes, show_progress)
+        collector = super().run_suite(num_runs_per_scheme, initial_value,
+                                      self.additive_schemes, show_progress)
+        if 'GSW' in collector.results:
+            gsw_runs = collector.results['GSW']
+            if gsw_runs:
+                acc = getattr(gsw_runs[0], 'gsw_bit_accuracy', None)
+                if acc is not None:
+                    print(f"\nGSW Additive Bit Accuracy: {acc:.2%}")
+        return collector

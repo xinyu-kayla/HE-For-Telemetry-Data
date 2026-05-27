@@ -163,9 +163,10 @@ def main():
             save_path = os.path.join(full_output_dir, f"fully_{scheme_name}_metrics.pkl")
             save_experiment_data([r.to_dict() for r in runs], save_path)
 
-    # Generate visualizations
+    # Generate visualizations and error tables
     if not args.no_plots:
         plotter = ExperimentPlotter()
+        # Additive group
         if collector_additive:
             plotter.plot_error_accumulation(
                 collector_additive,
@@ -177,6 +178,8 @@ def main():
                 "Additive Group - ",
                 os.path.join(full_output_dir, "additive_latency_comparison.png"),
             )
+            plotter.save_error_table(collector_additive, "additive", full_output_dir)
+        # Multiplicative group
         if collector_multiplicative:
             plotter.plot_error_accumulation(
                 collector_multiplicative,
@@ -188,11 +191,37 @@ def main():
                 "Multiplicative Group - ",
                 os.path.join(full_output_dir, "multiplicative_latency_comparison.png"),
             )
+            plotter.save_error_table(collector_multiplicative, "multiplicative", full_output_dir)
+        # Fully group
         if collector_fully:
             plotter.plot_error_accumulation(
                 collector_fully,
                 "Fully Homomorphic Group - ",
                 os.path.join(full_output_dir, "fully_error_accumulation.png"),
+            )
+            plotter.plot_latency_comparison(
+                collector_fully,
+                "Fully Homomorphic Group - ",
+                os.path.join(full_output_dir, "fully_latency_comparison.png"),
+            )
+            plotter.save_error_table(collector_fully, "fully", full_output_dir)
+
+        # Combined GSW bit accuracy plot
+        gsw_collectors = []
+        gsw_group_names = []
+        if collector_additive and 'GSW' in collector_additive.results:
+            gsw_collectors.append(collector_additive)
+            gsw_group_names.append('Additive')
+        if collector_multiplicative and 'GSW' in collector_multiplicative.results:
+            gsw_collectors.append(collector_multiplicative)
+            gsw_group_names.append('Multiplicative')
+        if collector_fully and 'GSW' in collector_fully.results:
+            gsw_collectors.append(collector_fully)
+            gsw_group_names.append('Fully')
+        if gsw_collectors:
+            plotter.plot_gsw_bit_accuracy(
+                gsw_collectors, gsw_group_names,
+                os.path.join(full_output_dir, "gsw_bit_accuracy.png")
             )
 
     elapsed = time.time() - start_time

@@ -1,0 +1,17 @@
+[
+  {
+    "scheme_name": "ElGamal",
+    "num_hops": 4,
+    "operations_per_hop": 1,
+    "success": true,
+    "failure_reason": "",
+    "final_computed": 0.0,
+    "final_expected": -0.0,
+    "final_error": 0.0,
+    "final_relative_error": 0.0,
+    "mean_absolute_error": 0.0,
+    "max_absolute_error": 0.0,
+    "mean_latency": 9.924959158524871e-06,
+    "total_latency": 3.9699836634099483e-05
+  }
+]

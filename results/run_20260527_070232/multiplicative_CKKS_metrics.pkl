@@ -1,0 +1,47 @@
+[
+  {
+    "scheme_name": "CKKS",
+    "num_hops": 10,
+    "operations_per_hop": 1,
+    "success": false,
+    "failure_reason": "scale out of bounds",
+    "final_computed": -5.700982119721984,
+    "final_expected": -5.700881545411832,
+    "final_error": 0.00010057431015209062,
+    "final_relative_error": 1.764188737288716e-05,
+    "mean_absolute_error": 4.259724867313371e-05,
+    "max_absolute_error": 0.00010057431015209062,
+    "mean_latency": 0.012586283303486804,
+    "total_latency": 0.07551769982092083
+  },
+  {
+    "scheme_name": "CKKS",
+    "num_hops": 10,
+    "operations_per_hop": 1,
+    "success": false,
+    "failure_reason": "scale out of bounds",
+    "final_computed": -1.7472895267344808,
+    "final_expected": -1.747258699665995,
+    "final_error": 3.082706848589467e-05,
+    "final_relative_error": 1.7643104876240278e-05,
+    "mean_absolute_error": 1.3399455171906697e-05,
+    "max_absolute_error": 3.082706848589467e-05,
+    "mean_latency": 0.0117409000134406,
+    "total_latency": 0.0704454000806436
+  },
+  {
+    "scheme_name": "CKKS",
+    "num_hops": 10,
+    "operations_per_hop": 1,
+    "success": false,
+    "failure_reason": "scale out of bounds",
+    "final_computed": 11.70652209681188,
+    "final_expected": 11.706315560101038,
+    "final_error": 0.00020653671084325254,
+    "final_relative_error": 1.7643186686802895e-05,
+    "mean_absolute_error": 8.76008469354872e-05,
+    "max_absolute_error": 0.00020653671084325254,
+    "mean_latency": 0.011168733374991765,
+    "total_latency": 0.06701240024995059
+  }
+]
