@@ -20,6 +20,21 @@ class MultiplicativeExperiment(BaseExperiment):
         super().__init__(num_routers, num_fields)
         self.multiplicative_schemes = ['RSA', 'ElGamal', 'BGV', 'BFV', 'CKKS', 'GSW']
 
+    def _generate_multiplicative_factor(self, scheme: HEScheme) -> float:
+        """
+        Generate a multiplication factor based on the scheme's type,
+        using config.OP_VALUE_RANGES['multiplicative'].
+        """
+        stype = self._get_scheme_type(scheme)
+        ranges = config.OP_VALUE_RANGES['multiplicative']
+        low, high = ranges.get(stype, (0.95, 1.05))  # fallback to float default
+        if stype == 'integer':
+            return float(np.random.randint(int(low), int(high) + 1))  # inclusive upper bound
+        elif stype == 'boolean':
+            return float(np.random.randint(int(low), int(high) + 1))  # 0 or 1
+        else:  # float
+            return np.random.uniform(low, high)
+
     def _generate_router_operations(self) -> List[List[RoutingOperation]]:
         ops_per_router = []
         for _ in range(self.num_routers):
@@ -55,15 +70,10 @@ class MultiplicativeExperiment(BaseExperiment):
             sim.initialize(self.num_routers)
 
             adapted_ops = []
-            for ops in router_operations:
-                adapted = []
-                for op in ops:
-                    if op.op_type == OperationType.MULTIPLY_CONSTANT:
-                        adapted_val = self._adapt_value_for_scheme(op.value, scheme)
-                        adapted.append(RoutingOperation(OperationType.MULTIPLY_CONSTANT, adapted_val))
-                    else:
-                        adapted.append(op)
-                adapted_ops.append(adapted)
+            for hop_idx in range(self.num_routers):
+                factor = self._generate_multiplicative_factor(scheme)
+                adapted_val = self._adapt_value_for_scheme(factor, scheme)
+                adapted_ops.append([RoutingOperation(OperationType.MULTIPLY_CONSTANT, adapted_val)])
 
             initial_plaintexts = [initial_value] + [1.0] * (self.num_fields - 1)
             temp_ct = scheme.encrypt(initial_value, sim.keypair)
@@ -82,7 +92,7 @@ class MultiplicativeExperiment(BaseExperiment):
                 noise = scheme.get_noise_budget(temp_ct)
                 metrics.record_hop(hop_idx, computed, expected, noise=noise, latency=hop_latency)
 
-            packet = sim.send_packet(initial_plaintexts, router_operations)
+            packet = sim.send_packet(initial_plaintexts, adapted_ops)  
             final_computed = sim.get_final_value(packet)
             final_expected = expected_values[-1]
             metrics.final_computed = final_computed
@@ -158,3 +168,106 @@ class MultiplicativeExperiment(BaseExperiment):
                 if acc is not None:
                     print(f"\nGSW Multiplicative Bit Accuracy: {acc:.2%}")
         return collector
+
+    def _generate_single_hop_operation(self, step: int) -> List[RoutingOperation]:
+        return [RoutingOperation(OperationType.MULTIPLY_CONSTANT, 1.0)]
+
+    def run_stress_suite(
+        self,
+        num_runs_per_scheme: int,
+        initial_value: float,
+        max_steps: int = 100,
+        error_threshold: float = 0.5,
+        show_progress: bool = True
+    ) -> MetricsCollector:
+        from tqdm import tqdm
+        from core.registry import get_scheme
+        from core.network import NetworkSimulator
+
+        self.collector = MetricsCollector()
+
+        schemes_to_run = {}
+        for name in self.multiplicative_schemes:
+            try:
+                schemes_to_run[name] = get_scheme(name)
+            except Exception as e:
+                print(f"Warning: Could not initialize {name}: {e}")
+
+        total = len(schemes_to_run) * num_runs_per_scheme
+        iterator = tqdm(range(total), desc="Multiplicative Stress Test") if show_progress else range(total)
+        run_idx = 0
+
+        for name, scheme in schemes_to_run.items():
+            adapted_initial = self._adapt_value_for_scheme(initial_value, scheme)
+            for _ in range(num_runs_per_scheme):
+                run_initial = adapted_initial + self._adapt_value_for_scheme(
+                    np.random.uniform(-10, 10), scheme
+                )
+
+                metrics = ExperimentMetrics(scheme_name=scheme.name)
+                sim = NetworkSimulator(scheme)
+                sim.initialize(self.num_routers)
+
+                try:
+                    ciphertext = scheme.encrypt(run_initial, sim.keypair)
+                except Exception as e:
+                    metrics.success = False
+                    metrics.failure_reason = f"Initial encryption failed: {e}"
+                    metrics.finalize()
+                    self.collector.add_result(name, metrics)
+                    run_idx += 1
+                    if show_progress:
+                        iterator.update(1)
+                    continue
+
+                expected = run_initial
+
+                for step in range(1, max_steps + 1):
+                    factor = self._generate_multiplicative_factor(scheme)
+                    adapted_val = self._adapt_value_for_scheme(factor, scheme)
+
+                    hop_start = time.perf_counter()
+                    try:
+                        if scheme.supports_multiplicative():
+                            ciphertext = scheme.multiply_constant(ciphertext, adapted_val, sim.keypair)
+                            expected *= adapted_val
+                        else:
+                            raise RuntimeError(f"Scheme {scheme.name} does not support multiplication")
+                        hop_latency = time.perf_counter() - hop_start
+
+                        computed = scheme.decrypt(ciphertext, sim.keypair)
+                        abs_err = abs(computed - expected)
+                        rel_err = abs_err / (abs(expected) + 1e-10)
+
+                        if rel_err > error_threshold:
+                            metrics.failure_step = step
+                            metrics.success = False
+                            metrics.failure_reason = f"Relative error {rel_err:.4f} exceeded threshold"
+                            metrics.record_hop(step, computed, expected,
+                                               noise=scheme.get_noise_budget(ciphertext),
+                                               latency=hop_latency)
+                            break
+
+                        metrics.record_hop(step, computed, expected,
+                                           noise=scheme.get_noise_budget(ciphertext),
+                                           latency=hop_latency)
+                        metrics.max_sustainable_ops = step
+
+                    except Exception as e:
+                        metrics.failure_step = step
+                        metrics.success = False
+                        metrics.failure_reason = f"Error at step {step}: {e}"
+                        break
+
+                if metrics.failure_step == -1:
+                    metrics.success = True
+
+                metrics.num_hops = len(metrics.hop_numbers)
+                metrics.finalize()
+                self.collector.add_result(name, metrics)
+
+                if show_progress:
+                    iterator.update(1)
+                run_idx += 1
+
+        return self.collector

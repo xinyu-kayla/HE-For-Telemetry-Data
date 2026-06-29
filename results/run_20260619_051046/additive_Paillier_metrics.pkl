@@ -1,0 +1,19 @@
+[
+  {
+    "scheme_name": "Paillier",
+    "num_hops": 30,
+    "operations_per_hop": 1,
+    "success": true,
+    "failure_reason": "",
+    "final_computed": 183.0,
+    "final_expected": 183.0,
+    "final_error": 0.0,
+    "final_relative_error": 0.0,
+    "mean_absolute_error": 0.0,
+    "max_absolute_error": 0.0,
+    "mean_latency": 0.2124212800214688,
+    "total_latency": 6.372638400644064,
+    "max_sustainable_ops": 30,
+    "failure_step": -1
+  }
+]

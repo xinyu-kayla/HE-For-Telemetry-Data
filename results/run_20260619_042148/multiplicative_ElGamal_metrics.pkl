@@ -1,0 +1,53 @@
+[
+  {
+    "scheme_name": "ElGamal",
+    "num_hops": 30,
+    "operations_per_hop": 1,
+    "success": true,
+    "failure_reason": "",
+    "final_computed": 0.0,
+    "final_expected": 0.0,
+    "final_error": 0.0,
+    "final_relative_error": 0.0,
+    "mean_absolute_error": 0.0,
+    "max_absolute_error": 0.0,
+    "mean_latency": 7.613360260923704e-06,
+    "total_latency": 0.0002284008078277111,
+    "max_sustainable_ops": 30,
+    "failure_step": -1
+  },
+  {
+    "scheme_name": "ElGamal",
+    "num_hops": 30,
+    "operations_per_hop": 1,
+    "success": true,
+    "failure_reason": "",
+    "final_computed": 0.0,
+    "final_expected": 0.0,
+    "final_error": 0.0,
+    "final_relative_error": 0.0,
+    "mean_absolute_error": 0.0,
+    "max_absolute_error": 0.0,
+    "mean_latency": 6.590023015936216e-06,
+    "total_latency": 0.00019770069047808647,
+    "max_sustainable_ops": 30,
+    "failure_step": -1
+  },
+  {
+    "scheme_name": "ElGamal",
+    "num_hops": 30,
+    "operations_per_hop": 1,
+    "success": true,
+    "failure_reason": "",
+    "final_computed": 0.0,
+    "final_expected": 0.0,
+    "final_error": 0.0,
+    "final_relative_error": 0.0,
+    "mean_absolute_error": 0.0,
+    "max_absolute_error": 0.0,
+    "mean_latency": 7.333280518651009e-06,
+    "total_latency": 0.00021999841555953026,
+    "max_sustainable_ops": 30,
+    "failure_step": -1
+  }
+]

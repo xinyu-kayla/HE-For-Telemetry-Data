@@ -1,0 +1,4 @@
+Hop,Expected,Computed,Absolute Error
+0,20.0,20.0,0.0
+1,40.0,40.0,0.0
+2,120.0,24619.0,24499.0

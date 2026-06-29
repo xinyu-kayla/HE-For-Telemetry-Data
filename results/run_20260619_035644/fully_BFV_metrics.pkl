@@ -1,0 +1,53 @@
+[
+  {
+    "scheme_name": "BFV",
+    "num_hops": 0,
+    "operations_per_hop": 1,
+    "success": false,
+    "failure_reason": "Error at step 1: result ciphertext is transparent",
+    "final_computed": 0.0,
+    "final_expected": 0.0,
+    "final_error": 0.0,
+    "final_relative_error": 0.0,
+    "mean_absolute_error": 0,
+    "max_absolute_error": 0,
+    "mean_latency": 0,
+    "total_latency": 0,
+    "max_sustainable_ops": 0,
+    "failure_step": 1
+  },
+  {
+    "scheme_name": "BFV",
+    "num_hops": 0,
+    "operations_per_hop": 1,
+    "success": false,
+    "failure_reason": "Error at step 1: result ciphertext is transparent",
+    "final_computed": 0.0,
+    "final_expected": 0.0,
+    "final_error": 0.0,
+    "final_relative_error": 0.0,
+    "mean_absolute_error": 0,
+    "max_absolute_error": 0,
+    "mean_latency": 0,
+    "total_latency": 0,
+    "max_sustainable_ops": 0,
+    "failure_step": 1
+  },
+  {
+    "scheme_name": "BFV",
+    "num_hops": 4,
+    "operations_per_hop": 1,
+    "success": false,
+    "failure_reason": "Relative error 122.2857 exceeded threshold 0.5",
+    "final_computed": -849.0,
+    "final_expected": 7.0,
+    "final_error": 856.0,
+    "final_relative_error": 122.28571428396735,
+    "mean_absolute_error": 214.0,
+    "max_absolute_error": 856.0,
+    "mean_latency": 0.0020784500520676374,
+    "total_latency": 0.00831380020827055,
+    "max_sustainable_ops": 3,
+    "failure_step": 4
+  }
+]

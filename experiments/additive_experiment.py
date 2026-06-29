@@ -159,3 +159,61 @@ class AdditiveExperiment(BaseExperiment):
                 if acc is not None:
                     print(f"\nGSW Additive Bit Accuracy: {acc:.2%}")
         return collector
+
+    def _generate_single_hop_operation(self, step: int) -> List[RoutingOperation]:
+        """
+        Generate one ADD_CONSTANT operation for the stress test.
+        The constant is randomly chosen from [1, 10] (adapted later per scheme).
+        """
+        raw_val = np.random.uniform(1, 10)
+        return [RoutingOperation(OperationType.ADD_CONSTANT, raw_val)]
+
+    def run_stress_suite(
+        self,
+        num_runs_per_scheme: int,
+        initial_value: float,
+        max_steps: int = 100,
+        error_threshold: float = 0.5,
+        show_progress: bool = True
+    ) -> MetricsCollector:
+        """
+        Run stress tests (limit testing) for all additive schemes.
+        Each run increments operations until failure or max_steps.
+        """
+        from tqdm import tqdm
+        from core.registry import get_scheme
+
+        # Clear any previous results (or create a new collector)
+        self.collector = MetricsCollector()
+
+        schemes_to_run = {}
+        for name in self.additive_schemes:
+            try:
+                schemes_to_run[name] = get_scheme(name)
+            except Exception as e:
+                print(f"Warning: Could not initialize {name}: {e}")
+
+        total = len(schemes_to_run) * num_runs_per_scheme
+        iterator = tqdm(range(total), desc="Additive Stress Test") if show_progress else range(total)
+        run_idx = 0
+
+        for name, scheme in schemes_to_run.items():
+            adapted_initial = self._adapt_value_for_scheme(initial_value, scheme)
+            for _ in range(num_runs_per_scheme):
+                # Random perturbation
+                run_initial = adapted_initial + self._adapt_value_for_scheme(
+                    np.random.uniform(-10, 10), scheme
+                )
+                metrics = self.run_stress_test(
+                    scheme=scheme,
+                    initial_value=run_initial,
+                    max_steps=max_steps,
+                    error_threshold=error_threshold,
+                    run_id=run_idx
+                )
+                self.collector.add_result(name, metrics)
+                if show_progress:
+                    iterator.update(1)
+                run_idx += 1
+
+        return self.collector

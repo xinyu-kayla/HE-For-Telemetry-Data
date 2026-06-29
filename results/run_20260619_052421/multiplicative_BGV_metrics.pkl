@@ -1,0 +1,19 @@
+[
+  {
+    "scheme_name": "BGV",
+    "num_hops": 3,
+    "operations_per_hop": 0,
+    "success": false,
+    "failure_reason": "Relative error 153.0990 exceeded threshold",
+    "final_computed": 29587.0,
+    "final_expected": 192.0,
+    "final_error": 29395.0,
+    "final_relative_error": 153.0989583332536,
+    "mean_absolute_error": 9798.333333333334,
+    "max_absolute_error": 29395.0,
+    "mean_latency": 0.0007674666121602058,
+    "total_latency": 0.0023023998364806175,
+    "max_sustainable_ops": 2,
+    "failure_step": 3
+  }
+]

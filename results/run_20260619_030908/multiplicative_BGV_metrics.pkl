@@ -1,0 +1,53 @@
+[
+  {
+    "scheme_name": "BGV",
+    "num_hops": 1,
+    "operations_per_hop": 1,
+    "success": false,
+    "failure_reason": "Error at step 2: result ciphertext is transparent",
+    "final_computed": -7.0,
+    "final_expected": -7.0,
+    "final_error": 0.0,
+    "final_relative_error": 0.0,
+    "mean_absolute_error": 0.0,
+    "max_absolute_error": 0.0,
+    "mean_latency": 0.006360400002449751,
+    "total_latency": 0.006360400002449751,
+    "max_sustainable_ops": 1,
+    "failure_step": 2
+  },
+  {
+    "scheme_name": "BGV",
+    "num_hops": 1,
+    "operations_per_hop": 1,
+    "success": false,
+    "failure_reason": "Error at step 2: result ciphertext is transparent",
+    "final_computed": 7.0,
+    "final_expected": 7.0,
+    "final_error": 0.0,
+    "final_relative_error": 0.0,
+    "mean_absolute_error": 0.0,
+    "max_absolute_error": 0.0,
+    "mean_latency": 0.0008225999772548676,
+    "total_latency": 0.0008225999772548676,
+    "max_sustainable_ops": 1,
+    "failure_step": 2
+  },
+  {
+    "scheme_name": "BGV",
+    "num_hops": 0,
+    "operations_per_hop": 1,
+    "success": false,
+    "failure_reason": "Error at step 1: result ciphertext is transparent",
+    "final_computed": 0.0,
+    "final_expected": 0.0,
+    "final_error": 0.0,
+    "final_relative_error": 0.0,
+    "mean_absolute_error": 0,
+    "max_absolute_error": 0,
+    "mean_latency": 0,
+    "total_latency": 0,
+    "max_sustainable_ops": 0,
+    "failure_step": 1
+  }
+]

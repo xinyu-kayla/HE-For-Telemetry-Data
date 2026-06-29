@@ -1,0 +1,53 @@
+[
+  {
+    "scheme_name": "RSA",
+    "num_hops": 30,
+    "operations_per_hop": 1,
+    "success": true,
+    "failure_reason": "",
+    "final_computed": 0.0,
+    "final_expected": 0.0,
+    "final_error": 0.0,
+    "final_relative_error": 0.0,
+    "mean_absolute_error": 0.0,
+    "max_absolute_error": 0.0,
+    "mean_latency": 3.6300159990787504e-06,
+    "total_latency": 0.00010890047997236252,
+    "max_sustainable_ops": 30,
+    "failure_step": -1
+  },
+  {
+    "scheme_name": "RSA",
+    "num_hops": 30,
+    "operations_per_hop": 1,
+    "success": true,
+    "failure_reason": "",
+    "final_computed": 0.0,
+    "final_expected": 0.0,
+    "final_error": 0.0,
+    "final_relative_error": 0.0,
+    "mean_absolute_error": 0.0,
+    "max_absolute_error": 0.0,
+    "mean_latency": 3.889994695782662e-06,
+    "total_latency": 0.00011669984087347984,
+    "max_sustainable_ops": 30,
+    "failure_step": -1
+  },
+  {
+    "scheme_name": "RSA",
+    "num_hops": 0,
+    "operations_per_hop": 1,
+    "success": false,
+    "failure_reason": "Error at step 1: int too large to convert to float",
+    "final_computed": 0.0,
+    "final_expected": 0.0,
+    "final_error": 0.0,
+    "final_relative_error": 0.0,
+    "mean_absolute_error": 0,
+    "max_absolute_error": 0,
+    "mean_latency": 0,
+    "total_latency": 0,
+    "max_sustainable_ops": 0,
+    "failure_step": 1
+  }
+]

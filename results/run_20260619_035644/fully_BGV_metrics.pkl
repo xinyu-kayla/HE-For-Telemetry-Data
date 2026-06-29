@@ -1,0 +1,53 @@
+[
+  {
+    "scheme_name": "BGV",
+    "num_hops": 2,
+    "operations_per_hop": 1,
+    "success": false,
+    "failure_reason": "Error at step 3: end of modulus switching chain reached",
+    "final_computed": 6.0,
+    "final_expected": 6.0,
+    "final_error": 0.0,
+    "final_relative_error": 0.0,
+    "mean_absolute_error": 0.0,
+    "max_absolute_error": 0.0,
+    "mean_latency": 0.0007588001899421215,
+    "total_latency": 0.001517600379884243,
+    "max_sustainable_ops": 2,
+    "failure_step": 3
+  },
+  {
+    "scheme_name": "BGV",
+    "num_hops": 2,
+    "operations_per_hop": 1,
+    "success": false,
+    "failure_reason": "Error at step 3: end of modulus switching chain reached",
+    "final_computed": 16.0,
+    "final_expected": 16.0,
+    "final_error": 0.0,
+    "final_relative_error": 0.0,
+    "mean_absolute_error": 0.0,
+    "max_absolute_error": 0.0,
+    "mean_latency": 0.0008000999223440886,
+    "total_latency": 0.0016001998446881771,
+    "max_sustainable_ops": 2,
+    "failure_step": 3
+  },
+  {
+    "scheme_name": "BGV",
+    "num_hops": 1,
+    "operations_per_hop": 1,
+    "success": false,
+    "failure_reason": "Error at step 2: result ciphertext is transparent",
+    "final_computed": 9.0,
+    "final_expected": 9.0,
+    "final_error": 0.0,
+    "final_relative_error": 0.0,
+    "mean_absolute_error": 0.0,
+    "max_absolute_error": 0.0,
+    "mean_latency": 0.0008650003001093864,
+    "total_latency": 0.0008650003001093864,
+    "max_sustainable_ops": 1,
+    "failure_step": 2
+  }
+]

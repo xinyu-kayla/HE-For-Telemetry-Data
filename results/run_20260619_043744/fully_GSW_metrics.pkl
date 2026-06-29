@@ -1,0 +1,53 @@
+[
+  {
+    "scheme_name": "GSW",
+    "num_hops": 8,
+    "operations_per_hop": 1,
+    "success": false,
+    "failure_reason": "Relative error 1.0000 exceeded threshold 0.5",
+    "final_computed": 0.0,
+    "final_expected": 1.0,
+    "final_error": 1.0,
+    "final_relative_error": 0.9999999999,
+    "mean_absolute_error": 0.125,
+    "max_absolute_error": 1.0,
+    "mean_latency": 0.002486649958882481,
+    "total_latency": 0.019893199671059847,
+    "max_sustainable_ops": 7,
+    "failure_step": 8
+  },
+  {
+    "scheme_name": "GSW",
+    "num_hops": 5,
+    "operations_per_hop": 1,
+    "success": false,
+    "failure_reason": "Relative error 10000000000.0000 exceeded threshold 0.5",
+    "final_computed": 1.0,
+    "final_expected": 0.0,
+    "final_error": 1.0,
+    "final_relative_error": 10000000000.0,
+    "mean_absolute_error": 0.2,
+    "max_absolute_error": 1.0,
+    "mean_latency": 0.002624800056219101,
+    "total_latency": 0.013124000281095505,
+    "max_sustainable_ops": 4,
+    "failure_step": 5
+  },
+  {
+    "scheme_name": "GSW",
+    "num_hops": 5,
+    "operations_per_hop": 1,
+    "success": false,
+    "failure_reason": "Relative error 1.0000 exceeded threshold 0.5",
+    "final_computed": 0.0,
+    "final_expected": 1.0,
+    "final_error": 1.0,
+    "final_relative_error": 0.9999999999,
+    "mean_absolute_error": 0.2,
+    "max_absolute_error": 1.0,
+    "mean_latency": 0.00240458007901907,
+    "total_latency": 0.012022900395095348,
+    "max_sustainable_ops": 4,
+    "failure_step": 5
+  }
+]

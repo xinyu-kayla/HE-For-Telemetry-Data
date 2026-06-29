@@ -29,9 +29,11 @@ def parse_arguments():
     )
     parser.add_argument("--fully", action="store_true", help="Run fully homomorphic experiments")
     parser.add_argument("--all", action="store_true", help="Run all experiment groups")
+
     parser.add_argument(
         "--schemes", type=str, default="", help="Comma-separated list of specific schemes"
     )
+
     parser.add_argument("--runs", type=int, default=None, help="Number of runs per scheme")
     parser.add_argument(
         "--routers-add", type=int, default=None, help="Number of routers for additive group"
@@ -42,9 +44,24 @@ def parse_arguments():
     parser.add_argument(
         "--routers-fully", type=int, default=None, help="Number of routers for fully group"
     )
+
     parser.add_argument("--no-plots", action="store_true", help="Skip generating plots")
     parser.add_argument("--output-dir", type=str, default=None, help="Output directory for results")
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
+
+    parser.add_argument(
+        "--stress", action="store_true",
+        help="Run stress tests (limit testing) instead of fixed-step experiments"
+    )
+    parser.add_argument(
+        "--max-steps", type=int, default=50,
+        help="Maximum steps to attempt in stress test (default: 50)"
+    )
+    parser.add_argument(
+        "--threshold", type=float, default=0.5,
+        help="Relative error threshold for stress test failure (default: 0.5)"
+    )
+
     return parser.parse_args()
 
 
@@ -53,6 +70,43 @@ def setup_output_directory(output_dir: str) -> str:
     full_output_dir = os.path.join(output_dir, f"run_{timestamp}")
     os.makedirs(full_output_dir, exist_ok=True)
     return full_output_dir
+
+
+def run_experiment_group(exp_class, group_name, scheme_list_key, num_routers, initial_value,
+                         args, full_output_dir):
+    
+    exp = exp_class(num_routers=num_routers, num_fields=config.NUM_FIELDS)
+
+    if args.schemes:
+        specific = [s.strip() for s in args.schemes.split(",")]
+        allowed = getattr(exp, scheme_list_key)
+        setattr(exp, scheme_list_key, [s for s in specific if s in allowed])
+
+    if args.stress:
+        print(f"\n>>> Running STRESS TEST for {group_name} (max_steps={args.max_steps}, threshold={args.threshold})")
+        collector = exp.run_stress_suite(
+            num_runs_per_scheme=args.runs,
+            initial_value=initial_value,
+            max_steps=args.max_steps,
+            error_threshold=args.threshold,
+            show_progress=True
+        )
+    else:
+        print(f"\n>>> Running STANDARD experiment for {group_name}")
+        collector = exp.run_suite(
+            num_runs_per_scheme=args.runs,
+            initial_value=initial_value,
+            show_progress=True
+        )
+
+    print_experiment_summary(collector, f"{group_name} Group")
+
+    for scheme_name, runs in collector.results.items():
+        prefix = group_name.lower().replace(" ", "_")
+        save_path = os.path.join(full_output_dir, f"{prefix}_{scheme_name}_metrics.pkl")
+        save_experiment_data([r.to_dict() for r in runs], save_path)
+
+    return collector
 
 
 def main():
@@ -71,142 +125,84 @@ def main():
     num_routers_fully = args.routers_fully if args.routers_fully is not None else config.NUM_ROUTERS_FULLY
     output_dir = args.output_dir if args.output_dir is not None else config.OUTPUT_DIR
 
-    specific_schemes = [s.strip() for s in args.schemes.split(",")] if args.schemes else []
-
     print("=" * 70)
     print("TELEMETRY HOMOMORPHIC ENCRYPTION VALIDATION MODEL")
     print("=" * 70)
     print(f"Random seed: {args.seed}")
+    print(f"Mode: {'STRESS TEST' if args.stress else 'STANDARD (fixed steps)'}")
+    if args.stress:
+        print(f"  Max steps: {args.max_steps}, Error threshold: {args.threshold}")
     print(f"Runs per scheme: {num_runs}")
     print(f"Additive routers: {num_routers_add}")
     print(f"Multiplicative routers: {num_routers_mul}")
     print(f"Fully homomorphic routers: {num_routers_fully}")
-    if specific_schemes:
-        print(f"Specific schemes: {specific_schemes}")
+    if args.schemes:
+        print(f"Specific schemes: {args.schemes}")
     print("=" * 70)
 
     full_output_dir = setup_output_directory(output_dir)
     print(f"Results will be saved to: {full_output_dir}\n")
 
+    start_time = time.time()
+
     collector_additive = None
     collector_multiplicative = None
     collector_fully = None
 
-    start_time = time.time()
-
-    # Run additive experiments
     if run_additive:
-        print("\n" + "=" * 50)
-        print("ADDITIVE GROUP EXPERIMENTS")
-        print("Schemes: Paillier, BGN, BGV, BFV, CKKS, GSW")
-        print("=" * 50 + "\n")
-        additive_exp = AdditiveExperiment(
-            num_routers=num_routers_add, num_fields=config.NUM_FIELDS
+        collector_additive = run_experiment_group(
+            AdditiveExperiment,
+            "Additive",
+            "additive_schemes",
+            num_routers_add,
+            config.INITIAL_TELEMETRY_ADDITIVE,
+            args,
+            full_output_dir
         )
-        if specific_schemes:
-            additive_exp.additive_schemes = [
-                s for s in specific_schemes if s in additive_exp.additive_schemes
-            ]
-        collector_additive = additive_exp.run_suite(
-            num_runs_per_scheme=num_runs,
-            initial_value=config.INITIAL_TELEMETRY_ADDITIVE,
-            show_progress=True,
-        )
-        print_experiment_summary(collector_additive, "Additive Group")
-        for scheme_name, runs in collector_additive.results.items():
-            save_path = os.path.join(full_output_dir, f"additive_{scheme_name}_metrics.pkl")
-            save_experiment_data([r.to_dict() for r in runs], save_path)
 
-    # Run multiplicative experiments
     if run_multiplicative:
-        print("\n" + "=" * 50)
-        print("MULTIPLICATIVE GROUP EXPERIMENTS")
-        print("Schemes: RSA, ElGamal, BGV, BFV, CKKS, GSW")
-        print("=" * 50 + "\n")
-        multiplicative_exp = MultiplicativeExperiment(
-            num_routers=num_routers_mul, num_fields=config.NUM_FIELDS
+        collector_multiplicative = run_experiment_group(
+            MultiplicativeExperiment,
+            "Multiplicative",
+            "multiplicative_schemes",
+            num_routers_mul,
+            config.INITIAL_TELEMETRY_MULTIPLICATIVE,
+            args,
+            full_output_dir
         )
-        if specific_schemes:
-            multiplicative_exp.multiplicative_schemes = [
-                s for s in specific_schemes if s in multiplicative_exp.multiplicative_schemes
-            ]
-        collector_multiplicative = multiplicative_exp.run_suite(
-            num_runs_per_scheme=num_runs,
-            initial_value=config.INITIAL_TELEMETRY_MULTIPLICATIVE,
-            show_progress=True,
-        )
-        print_experiment_summary(collector_multiplicative, "Multiplicative Group")
-        for scheme_name, runs in collector_multiplicative.results.items():
-            save_path = os.path.join(full_output_dir, f"multiplicative_{scheme_name}_metrics.pkl")
-            save_experiment_data([r.to_dict() for r in runs], save_path)
 
-    # Run fully homomorphic experiments
     if run_fully:
-        print("\n" + "=" * 50)
-        print("FULLY HOMOMORPHIC GROUP EXPERIMENTS")
-        print("Schemes: BGV, BFV, CKKS, GSW")
-        print("=" * 50 + "\n")
-        fully_exp = FullyExperiment(
-            num_routers=num_routers_fully, num_fields=config.NUM_FIELDS
+        collector_fully = run_experiment_group(
+            FullyExperiment,
+            "Fully",
+            "fully_schemes",
+            num_routers_fully,
+            config.INITIAL_TELEMETRY_FULLY,
+            args,
+            full_output_dir
         )
-        if specific_schemes:
-            fully_exp.fully_schemes = [
-                s for s in specific_schemes if s in fully_exp.fully_schemes
-            ]
-        collector_fully = fully_exp.run_suite(
-            num_runs_per_scheme=num_runs,
-            initial_value=config.INITIAL_TELEMETRY_FULLY,
-            show_progress=True,
-        )
-        print_experiment_summary(collector_fully, "Fully Homomorphic Group")
-        for scheme_name, runs in collector_fully.results.items():
-            save_path = os.path.join(full_output_dir, f"fully_{scheme_name}_metrics.pkl")
-            save_experiment_data([r.to_dict() for r in runs], save_path)
 
-    # Generate visualizations and error tables
     if not args.no_plots:
         plotter = ExperimentPlotter()
-        # Additive group
-        if collector_additive:
-            plotter.plot_error_accumulation(
-                collector_additive,
-                "Additive Group - ",
-                os.path.join(full_output_dir, "additive_error_accumulation.png"),
-            )
-            plotter.plot_latency_comparison(
-                collector_additive,
-                "Additive Group - ",
-                os.path.join(full_output_dir, "additive_latency_comparison.png"),
-            )
-            plotter.save_error_table(collector_additive, "additive", full_output_dir)
-        # Multiplicative group
-        if collector_multiplicative:
-            plotter.plot_error_accumulation(
-                collector_multiplicative,
-                "Multiplicative Group - ",
-                os.path.join(full_output_dir, "multiplicative_error_accumulation.png"),
-            )
-            plotter.plot_latency_comparison(
-                collector_multiplicative,
-                "Multiplicative Group - ",
-                os.path.join(full_output_dir, "multiplicative_latency_comparison.png"),
-            )
-            plotter.save_error_table(collector_multiplicative, "multiplicative", full_output_dir)
-        # Fully group
-        if collector_fully:
-            plotter.plot_error_accumulation(
-                collector_fully,
-                "Fully Homomorphic Group - ",
-                os.path.join(full_output_dir, "fully_error_accumulation.png"),
-            )
-            plotter.plot_latency_comparison(
-                collector_fully,
-                "Fully Homomorphic Group - ",
-                os.path.join(full_output_dir, "fully_latency_comparison.png"),
-            )
-            plotter.save_error_table(collector_fully, "fully", full_output_dir)
 
-        # Combined GSW bit accuracy plot
+        def plot_group(collector, group_prefix, file_suffix):
+            if collector:
+                plotter.plot_error_accumulation(
+                    collector,
+                    f"{group_prefix} - ",
+                    os.path.join(full_output_dir, f"{file_suffix}_error_accumulation.png")
+                )
+                plotter.plot_latency_comparison(
+                    collector,
+                    f"{group_prefix} - ",
+                    os.path.join(full_output_dir, f"{file_suffix}_latency_comparison.png")
+                )
+                plotter.save_error_table(collector, file_suffix, full_output_dir)
+
+        plot_group(collector_additive, "Additive Group", "additive")
+        plot_group(collector_multiplicative, "Multiplicative Group", "multiplicative")
+        plot_group(collector_fully, "Fully Homomorphic Group", "fully")
+
         gsw_collectors = []
         gsw_group_names = []
         if collector_additive and 'GSW' in collector_additive.results:
@@ -223,6 +219,26 @@ def main():
                 gsw_collectors, gsw_group_names,
                 os.path.join(full_output_dir, "gsw_bit_accuracy.png")
             )
+
+    if args.stress:
+        print("\n" + "=" * 70)
+        print("STRESS TEST SUMMARY - Maximum Sustainable Operations")
+        print("=" * 70)
+        for group_name, collector in [
+            ("Additive", collector_additive),
+            ("Multiplicative", collector_multiplicative),
+            ("Fully", collector_fully)
+        ]:
+            if collector and collector.results:
+                print(f"\n{group_name} Group:")
+                for scheme, runs in collector.results.items():
+                    if runs:
+                        max_ops = max(r.max_sustainable_ops for r in runs)
+                        failures = [r.failure_step for r in runs if r.failure_step != -1]
+                        success_count = sum(1 for r in runs if r.success)
+                        print(f"  {scheme:10s} : max_ops = {max_ops:3d}, "
+                              f"successful runs = {success_count}/{len(runs)}, "
+                              f"failures at steps {failures if failures else 'none'}")
 
     elapsed = time.time() - start_time
     print("\n" + "=" * 70)

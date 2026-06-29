@@ -8,7 +8,7 @@ NUM_ROUTERS_MULTIPLICATIVE = 4
 NUM_RUNS_PER_SCHEME = 5
 NUM_FIELDS = 3
 
-# Telemetry Data Values (will be overridden per scheme type)
+# Telemetry Data Values 
 INITIAL_TELEMETRY_ADDITIVE = 50.0
 INITIAL_TELEMETRY_MULTIPLICATIVE = 2.0
 SECONDARY_TELEMETRY_MULTIPLICATIVE = 3.0
@@ -17,7 +17,7 @@ SECONDARY_TELEMETRY_MULTIPLICATIVE = 3.0
 RSA_KEY_SIZE = 1024
 
 # ElGamal Configuration
-ELGAMAL_KEY_SIZE = 256
+ELGAMAL_KEY_SIZE = 1024
 
 # Paillier Configuration
 PAILLIER_KEY_SIZE = 1024
@@ -71,9 +71,9 @@ INITIAL_VALUES = {
 # For boolean, all values will be taken modulo 2 later.
 OP_VALUE_RANGES = {
     'additive':   {'integer': (1, 10),     'float': (1.0, 10.0),   'boolean': (0, 1)},
-    'multiplicative': {'integer': (1, 2),  'float': (0.95, 1.05), 'boolean': (0, 1)},
+    'multiplicative': {'integer': (2, 5),  'float': (0.95, 1.05), 'boolean': (0, 1)},
     'fully':      {
         'add':   {'integer': (1, 5),       'float': (1.0, 5.0),     'boolean': (0, 1)},
-        'mul':   {'integer': (1, 2),       'float': (0.95, 1.05),   'boolean': (0, 1)},
+        'mul':   {'integer': (2, 5),       'float': (0.95, 1.05),   'boolean': (0, 1)},
     },
 }

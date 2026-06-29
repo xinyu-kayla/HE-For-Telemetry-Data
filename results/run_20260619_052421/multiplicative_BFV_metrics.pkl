@@ -1,0 +1,19 @@
+[
+  {
+    "scheme_name": "BFV",
+    "num_hops": 3,
+    "operations_per_hop": 0,
+    "success": false,
+    "failure_reason": "Relative error 92.7917 exceeded threshold",
+    "final_computed": -11015.0,
+    "final_expected": 120.0,
+    "final_error": 11135.0,
+    "final_relative_error": 92.79166666658934,
+    "mean_absolute_error": 3711.6666666666665,
+    "max_absolute_error": 11135.0,
+    "mean_latency": 0.0013843999865154426,
+    "total_latency": 0.004153199959546328,
+    "max_sustainable_ops": 2,
+    "failure_step": 3
+  }
+]

@@ -1,0 +1,53 @@
+[
+  {
+    "scheme_name": "CKKS",
+    "num_hops": 9,
+    "operations_per_hop": 1,
+    "success": false,
+    "failure_reason": "Error at step 10: scale out of bounds",
+    "final_computed": 23.716243184487585,
+    "final_expected": 23.715871439899704,
+    "final_error": 0.00037174458788058473,
+    "final_relative_error": 1.5674928447014273e-05,
+    "mean_absolute_error": 0.00014198986653626535,
+    "max_absolute_error": 0.00037174458788058473,
+    "mean_latency": 0.0223714556131098,
+    "total_latency": 0.2013431005179882,
+    "max_sustainable_ops": 9,
+    "failure_step": 10
+  },
+  {
+    "scheme_name": "CKKS",
+    "num_hops": 9,
+    "operations_per_hop": 1,
+    "success": false,
+    "failure_reason": "Error at step 10: scale out of bounds",
+    "final_computed": 17.983937635511847,
+    "final_expected": 17.983699646575438,
+    "final_error": 0.0002379889364085841,
+    "final_relative_error": 1.3233591590403369e-05,
+    "mean_absolute_error": 7.718893476916911e-05,
+    "max_absolute_error": 0.0002379889364085841,
+    "mean_latency": 0.022393211153232388,
+    "total_latency": 0.2015389003790915,
+    "max_sustainable_ops": 9,
+    "failure_step": 10
+  },
+  {
+    "scheme_name": "CKKS",
+    "num_hops": 9,
+    "operations_per_hop": 1,
+    "success": false,
+    "failure_reason": "Error at step 10: scale out of bounds",
+    "final_computed": 15.941978037122366,
+    "final_expected": 15.941761408993072,
+    "final_error": 0.0002166281292943495,
+    "final_relative_error": 1.358871982432169e-05,
+    "mean_absolute_error": 7.481181312574137e-05,
+    "max_absolute_error": 0.0002166281292943495,
+    "mean_latency": 0.022385333406014576,
+    "total_latency": 0.20146800065413117,
+    "max_sustainable_ops": 9,
+    "failure_step": 10
+  }
+]

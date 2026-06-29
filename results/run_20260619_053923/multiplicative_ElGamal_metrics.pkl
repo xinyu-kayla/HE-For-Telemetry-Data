@@ -1,0 +1,19 @@
+[
+  {
+    "scheme_name": "ElGamal",
+    "num_hops": 7,
+    "operations_per_hop": 0,
+    "success": false,
+    "failure_reason": "Relative error 0.5933 exceeded threshold",
+    "final_computed": 24403.0,
+    "final_expected": 60000.0,
+    "final_error": 35597.0,
+    "final_relative_error": 0.5932833333333323,
+    "mean_absolute_error": 5085.285714285715,
+    "max_absolute_error": 35597.0,
+    "mean_latency": 8.099912000553949e-06,
+    "total_latency": 5.669938400387764e-05,
+    "max_sustainable_ops": 6,
+    "failure_step": 7
+  }
+]
